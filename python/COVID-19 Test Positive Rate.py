@@ -91,15 +91,18 @@ def plot_by_state(df, action_index):
 
 # # Test Positive Rate Trend by State
 
-# In[6]:
+# In[71]:
 
 
 def state_pos_rate(df, state):
     df_state= slice_state(df, state)
+    print('Cumulative test positive rate for the recent 3 days')
+    for a in range(3):
+        print('%s: %.1f' % (df_state.at[a, 'date'].strftime('%Y-%m-%d'), df_state.at[a, 'total_pos_rate']) + '%')
     plot_test_pos_rate(df_state, state)
 
 
-# In[46]:
+# In[43]:
 
 
 def slice_state(df, state):
@@ -107,11 +110,12 @@ def slice_state(df, state):
     df_state['total_pos_rate']= df_state['positive']/df_state['total']*100
     df_state['daily_pos_rate']= df_state['positiveIncrease']/df_state['totalTestResultsIncrease']*100
     df_state['date']= pd.to_datetime(df_state['dateChecked'].str.slice(0, 10, 1), format= '%Y-%m-%d')
+    df_state.reset_index(inplace= True)
     
     return df_state
 
 
-# In[7]:
+# In[8]:
 
 
 def plot_test_pos_rate(df, state):
@@ -154,20 +158,20 @@ def plot_test_pos_rate(df, state):
 
 # # User Interface
 
-# In[48]:
+# In[9]:
 
 
 latest_by_state(df)
 
 
-# In[49]:
+# In[72]:
 
 
 state_pos_rate(df, 'NY')
 
 
-# In[50]:
+# In[73]:
 
 
-state_pos_rate(df, 'AS')
+state_pos_rate(df, 'CA')
 
