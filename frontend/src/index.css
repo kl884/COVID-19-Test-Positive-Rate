@@ -11,20 +11,34 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.App {
+  padding: 4% 0%;
+}
+
+
 
 .chart-wrapper {
   padding: 2%;
-  display: inline-block;
+  display:inline-block;
+  vertical-align: top;
 }
 
 .main.chart-wrapper {
   width: 96%;
-  height: 400px;
 }
 
 .sub.chart-wrapper {
   width: 29%;
   height: 300px;
+}
+
+.sub-double.chart-wrapper {
+  width: 29%;
+  height:600px;
+}
+
+.combo-box-demo {
+  margin: auto;
 }
 
 /* Simple responsivenss example */
