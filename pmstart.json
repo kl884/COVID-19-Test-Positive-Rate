@@ -1,0 +1,18 @@
+{
+    "apps" : [{
+      "name"       : "Server",
+      "cwd"        : "./backend",
+      "script"     : "npm",
+      "args" : "start",
+      "kill_timeout" : 3000,
+      "exec_mode"  : "fork_mode",
+      "watch"  : true,
+      "ignore_watch" : ["node_modules"],
+      "autorestart"      : true,
+      "merge_logs"      : true,
+      "env": {
+       "TZ": "America/Vancouver"
+       },
+      "log_date_format" : "YYYY-MM-DD HH:mm Z"
+    }]
+}
