@@ -63,7 +63,7 @@ const convertToJsonFile = function (data) {
   return new Promise((resolve, reject) => {
     const state = 'NY'
     const results = []
-    fs.createReadStream('data.csv')
+    fs.createReadStream('../python/test.csv')
       .pipe(csv())
       .on('data', (data) => {
         if (data.state !== state) return
