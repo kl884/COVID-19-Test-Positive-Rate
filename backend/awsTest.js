@@ -33,18 +33,21 @@ const fetchCsv = function (data) {
   options.secretAccessKey = data.Credentials.SecretAccessKey
   options.sessionToken = data.Credentials.SessionToken
   const s3 = new AWS.S3(options)
-  return s3.getObject({ Bucket: BUCKET_NAME, Key: 'NY/test.csv' }).promise()
+  return s3.getObject({ Bucket: BUCKET_NAME, Key: 'test.csv' }).promise()
 }
 
 const convertToJson = function (data) {
   return new Promise((resolve, reject) => {
+    const state = 'NY'
     const results = []
     const bufferStream = new stream.PassThrough()
     bufferStream.end(data.Body)
     bufferStream
       .pipe(csv())
       .on('data', (data) => {
+        if (data.state !== state) return
         const keys = Object.keys(data)
+        keys.shift()
         for (const key of keys) {
           data[key] = parseFloat(data[key])
         }

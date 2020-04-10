@@ -8,7 +8,7 @@ const stream = require('stream')
 const csv = require('csv-parser')
 
 const BUCKET_NAME = 'covid-19-trends-stanley'
-
+const CSV_NAME = 'test.csv'
 const options = {
   apiVersions: {
     s3: '2006-03-01',
@@ -21,10 +21,10 @@ const router = express.Router()
 
 const fetchCsv = function () {
   const s3 = new AWS.S3(options)
-  return s3.getObject({ Bucket: BUCKET_NAME, Key: 'NY/test.csv' }).promise()
+  return s3.getObject({ Bucket: BUCKET_NAME, Key: CSV_NAME }).promise()
 }
 
-const convertToJson = function (data) {
+const convertToJson = function (data, state) {
   return new Promise((resolve, reject) => {
     const results = []
     const bufferStream = new stream.PassThrough()
@@ -32,7 +32,9 @@ const convertToJson = function (data) {
     bufferStream
       .pipe(csv())
       .on('data', (data) => {
+        if (data.state !== state) return
         const keys = Object.keys(data)
+        keys.shift()
         for (const key of keys) {
           data[key] = parseFloat(data[key])
         }
@@ -47,7 +49,7 @@ const convertToJson = function (data) {
 router.get('/data', async (req, res) => {
   console.log('fetching data request')
   const fetchedData = await fetchCsv()
-  const dataArray = await convertToJson(fetchedData)
+  const dataArray = await convertToJson(fetchedData, req.query.state)
   const responseBody = {
     data: dataArray
   }

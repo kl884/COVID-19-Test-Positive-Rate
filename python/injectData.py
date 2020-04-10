@@ -16,15 +16,21 @@ def slice_latest(df):
     return df_latest
 
 # for line graphs
-def slice_state(df, state):
-    df_state= df.loc[df['state'] == state]
-    df_state.reset_index(inplace= True)
-    data_for_graph = 
-    {
-        'total_pos_rate': df_state['positive']/df_state['total']*100,
-        'daily_pos_Rate': df_state['positiveIncrease']/df_state['totalTestResultsIncrease']*100,
-        'date':list(map(lambda date: dateutil.parser.parse(date).timestamp()*1000, df_state['dateChecked'])), # REMINDER can use ISO 8601 string for drawing chart but will test later
-        'totalTestResultsIncrease':df_state['totalTestResultsIncrease']
+def slice_state(df, state=None):
+    # df_state= df.loc[df['state'] == state]
+    if state is not None:
+        df = df.loc[df['state'] == state]
+    data_for_graph = {
+        'state': df['state'],
+        'total_pos_rate': df['positive']/df['total']*100,
+        'daily_pos_Rate': df['positiveIncrease']/df['totalTestResultsIncrease']*100,
+
+        # date is in ISO 8601 format by default, now converting to miliseconds unix timestamp
+        # REMINDER can use ISO 8601 string for drawing chart but will test later
+        'date':list(map(lambda date: dateutil.parser.parse(date).timestamp()*1000, df['dateChecked'])), 
+        
+        'totalTestResultsIncrease':df['totalTestResultsIncrease'],
+        'positive': df['positive'].fillna(0).round(0).astype(int)
     }
     result_df = pd.DataFrame(data_for_graph)
     result_df.to_csv(RELATIVE_PATH_CSV, index=False, header=True)
@@ -34,5 +40,5 @@ if __name__ == '__main__':
     # df = pd.DataFrame()
     df = pd.read_csv('http://covidtracking.com/api/states/daily.csv', usecols=COLUMNS_FOR_POS_TREND)
     print(df.head())
-    df_ny = slice_state(df,'NY')
-    print(df_ny)
+    df_states = slice_state(df)
+    print(df_states)
