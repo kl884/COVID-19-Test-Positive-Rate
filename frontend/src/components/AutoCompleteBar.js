@@ -12,6 +12,7 @@ export default function ComboBox (props) {
       style={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label='States' variant='outlined' />}
       onChange={props.onHandleChange}
+      defaultValue={{ title: 'New York, NY', input: 'NY' }}
     />
   )
 }

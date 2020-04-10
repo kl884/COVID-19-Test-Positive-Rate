@@ -11,19 +11,37 @@ class App extends React.Component {
     super(props)
     this.handleChange = this.handleChange.bind(this)
     this.state = {
-      data: getData('NY')
+      data: null,
+      charts: []
     }
   }
 
   handleChange (event, value, reason) {
     if (value === null) return
-    this.setState({
-      data: getData(value.input)
-    })
+    getData(value.input)
+      .then((data) => {
+        this.setState({
+          data: data
+        })
+      })
   }
 
+  // componentWillMount () {
+  //   getData('NY')
+  //     .then((data) => {
+  //       this.setState({
+  //         data: data
+  //       })
+  //     })
+  // }
+
   componentDidMount () {
-    console.log('compoenent did mount')
+    getData('NY')
+      .then((data) => {
+        this.setState({
+          data: data
+        })
+      })
   }
 
   render () {
@@ -32,24 +50,25 @@ class App extends React.Component {
         <div className='main chart-wrapper'>
           <ComboBox onHandleChange={this.handleChange} />
         </div>
-        <div className='sub-double chart-wrapper'>
-          <div style={{ height: 300 }}>
-            <CumulChart
-              data={this.state.data[0].data}
-              title={this.state.data[0].title}
-              yLabel='Cumulative Test Positive Rate (%)'
-              color='#3E517A'
-            />
-          </div>
-          <div style={{ height: 300 }}>
-            <DailyChart
-              dataRate={this.state.data[1].data}
-              dataVol={this.state.data[2].data}
-              color='#3E517A'
-            />
-          </div>
-        </div>
-        <div className='sub-double chart-wrapper'>
+        {this.state.data &&
+          <div className='sub-double chart-wrapper'>
+            <div style={{ height: 300 }}>
+              <CumulChart
+                data={this.state.data[0].data}
+                title={this.state.data[0].title}
+                yLabel='Cumulative Test Positive Rate (%)'
+                color='#3E517A'
+              />
+            </div>
+            <div style={{ height: 300 }}>
+              <DailyChart
+                dataRate={this.state.data[1].data}
+                dataVol={this.state.data[2].data}
+                color='#3E517A'
+              />
+            </div>
+          </div>}
+        {this.state.data && <div className='sub-double chart-wrapper'>
           <div style={{ height: 300 }}>
             <PredDailyChart
               dataModel={this.state.data[3].data}
@@ -63,10 +82,12 @@ class App extends React.Component {
             <PredCumulChart
               dataModel={this.state.data[5].data}
               dataActual={this.state.data[6].data}
+              title={this.state.data[5].title}
               color='#3E517A'
             />
           </div>
-        </div>
+        </div>}
+
       </div>
     )
   }

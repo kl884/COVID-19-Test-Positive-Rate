@@ -1,3 +1,4 @@
+/* global fetch */
 function getRandomArray (numItems) {
   // Create random array of objects
   const names = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -25,25 +26,49 @@ function getRandomDateArray (numItems, min, max) {
   return data
 }
 
-export function getData (value) {
+async function fetchData (state) {
+  const data = await fetch(`http://54.244.209.103/api/data?state=${state}`, {
+    method: 'GET'
+  })
+  return data.json()
+}
+
+export async function getData (state) {
   const data = []
+  const fetchedData = await fetchData(state)
+  console.log(fetchedData.data)
   data.push({
-    title: `${value} State COVID-19 Test Positive Rate`,
-    data: getRandomDateArray(20, 0, 80)
+    title: `${state} State COVID-19 Test Positive Rate`,
+    data: fetchedData.data.map((row) => {
+      return {
+        time: row.date,
+        value: row.total_pos_rate
+      }
+    })
   })
 
   data.push({
     title: 'DailyTestPos',
-    data: getRandomDateArray(20, 0, 100)
+    data: fetchedData.data.map((row) => {
+      return {
+        time: row.date,
+        value: row.daily_pos_Rate
+      }
+    })
   })
 
   data.push({
     title: 'DailyTestVol',
-    data: getRandomDateArray(20, 0, 30000)
+    data: fetchedData.data.map((row) => {
+      return {
+        time: row.date,
+        value: row.totalTestResultsIncrease
+      }
+    })
   })
 
   data.push({
-    title: `${value} State COVID-19 Daily New Cases Prediction`,
+    title: `${state} State COVID-19 Daily New Cases Prediction`,
     data: getRandomDateArray(40, 0, 30000)
   })
   data.push({
@@ -51,7 +76,7 @@ export function getData (value) {
     data: getRandomDateArray(20, 0, 30000)
   })
   data.push({
-    title: 'CumulCaseModel',
+    title: `${state} State COVID-19 Cumulative Cases Prediction`,
     data: getRandomDateArray(40, 0, 30000)
   })
   data.push({

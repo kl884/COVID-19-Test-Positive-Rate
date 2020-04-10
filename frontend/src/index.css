@@ -21,11 +21,11 @@ code {
   padding: 2%;
   display:inline-block;
   vertical-align: top;
-}
-
-.main.chart-wrapper {
   width: 96%;
 }
+
+/* .main.chart-wrapper {
+} */
 
 .sub.chart-wrapper {
   width: 29%;
@@ -33,7 +33,6 @@ code {
 }
 
 .sub-double.chart-wrapper {
-  width: 29%;
   height:600px;
 }
 
@@ -42,8 +41,8 @@ code {
 }
 
 /* Simple responsivenss example */
-@media (max-width: 700px) {
-  .sub.chart-wrapper {
-    width: 96%;
+@media (min-width: 1400px) {
+  .sub-double.chart-wrapper {
+    width: 46%;
   }
 }
