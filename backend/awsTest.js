@@ -59,22 +59,38 @@ const convertToJson = function (data) {
   })
 }
 
-assumeRole()
-  .then(fetchCsv)
-  .then(convertToJson)
+const convertToJsonFile = function (data) {
+  return new Promise((resolve, reject) => {
+    const state = 'NY'
+    const results = []
+    fs.createReadStream('data.csv')
+      .pipe(csv())
+      .on('data', (data) => {
+        if (data.state !== state) return
+        const keys = Object.keys(data)
+        keys.shift()
+        for (const key of keys) {
+          data[key] = parseFloat(data[key])
+        }
+        results.push(data)
+      })
+      .on('end', () => {
+        resolve(results)
+      })
+  })
+}
+
+// assumeRole()
+//   .then(fetchCsv)
+//   .then(convertToJson)
+//   .then((result) => {
+//     console.log(result)
+//   })
+//   .catch((error) => {
+//     console.log('error: ', error)
+//   })
+
+convertToJsonFile()
   .then((result) => {
     console.log(result)
   })
-  .catch((error) => {
-    console.log('error: ', error)
-  })
-
-// const s3 = new AWS.S3(options)
-
-// s3.listBuckets(function (err, data) {
-//   if (err) {
-//     console.log('Error', err)
-//   } else {
-//     console.log('success', data.Buckets)
-//   }
-// })
