@@ -3,7 +3,7 @@ import dateutil.parser
 import os
 
 COLUMNS_FOR_POS_TREND = ['state','positive','positiveIncrease','totalTestResultsIncrease','total','dateChecked']
-RELATIVE_PATH_CSV = ('./test.csv')('/home/ubuntu/project/COVID-19-Test-Positive-Rate/backend/data.csv')[if os.environ.get('PYTHON_ENVIRONMENT') is 'prod']
+RELATIVE_PATH_CSV = ('./test.csv')('/home/ubuntu/project/COVID-19-Test-Positive-Rate/backend/data.csv')[os.environ.get('PYTHON_ENVIRONMENT') is 'prod']
 
 # for choropleth graph
 def slice_latest(df):
