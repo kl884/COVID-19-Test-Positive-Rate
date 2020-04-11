@@ -7,6 +7,7 @@ const AWS = require('aws-sdk')
 const stream = require('stream')
 const csv = require('csv-parser')
 const fs = require('fs')
+const https = require('https')
 
 const BUCKET_NAME = 'covid-19-trends-stanley'
 const CSV_NAME = 'test.csv'
@@ -74,6 +75,14 @@ router.get('/data', async (req, res) => {
   return res.json(responseBody)
 })
 
+router.get('/line', async function (req, res) {
+  console.log('line webhook called')
+  responseBody = {
+    data: 'cool'
+  }
+  return res.json(responseBody)
+})
+
 app.use(bodyParser.urlencoded({
   extended: true
 }))
@@ -95,3 +104,12 @@ app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'))
 })
 http.createServer(app).listen(80, () => console.log('http server ready at 80'))
+
+if (process.env.NODE_ENV === 'prod') {
+  const options = {
+    key: fs.readFileSync('/home/ubuntu/ssl/private.key', 'utf8'),
+    cert: fs.readFileSync('/home/ubuntu/ssl/certificate.crt', 'utf8'),
+    ca: fs.readFileSync('/home/ubuntu/ssl/ca_bundle.crt', 'utf8')
+  }
+  https.createServer(options, app).listen(443, () => console.log('https server ready at 443!'))
+}
