@@ -1,5 +1,5 @@
 import React from 'react'
-import Datamap from 'datamaps/dist/datamaps.world.min.js'
+import Datamap from 'datamaps/dist/datamaps.usa.min.js'
 import d3 from 'd3'
 import USAJson from './usa.topo.json'
 import { fetchDataChoro } from './HelperFunc.js'
@@ -19,7 +19,8 @@ class ChoroplethMap extends React.Component {
     // We need to colorize every country based on "numberOfWhatever"
     // colors should be uniq for every value.
     // For this purpose we create palette(using min/max this.props.data-value)
-    const onlyValues = this.props.data.map((row) => row[1])
+    console.log(this.state.data)
+    const onlyValues = this.state.data.map((row) => row[1])
     const minValue = Math.min.apply(null, onlyValues)
     const maxValue = Math.max.apply(null, onlyValues)
 
@@ -30,7 +31,7 @@ class ChoroplethMap extends React.Component {
       .range(['#EFEFFF', '#02386F']) // blue color
 
     // fill dataset in appropriate format
-    this.props.data.forEach(function (item) { //
+    this.state.data.forEach(function (item) { //
       // item example value ["USA", 70]
       const iso = item[0]
       const value = item[1]
@@ -40,6 +41,7 @@ class ChoroplethMap extends React.Component {
     const map = new Datamap({
       element: document.getElementById('cloropleth_map'),
       scope: 'usa',
+      responsive: true,
       geographyConfig: {
         popupOnHover: true,
         highlightOnHover: true,
@@ -53,7 +55,7 @@ class ChoroplethMap extends React.Component {
           // tooltip content
           return ['<div class="hoverinfo">',
             '<strong>', geo.properties.name, '</strong>',
-            '<br>Count: <strong>', data.numberOfThings, '</strong>',
+            '<br>Total Positive Rate: <strong>', data.numberOfThings, '</strong>',
             '</div>'].join('')
         }
       },
@@ -81,7 +83,7 @@ class ChoroplethMap extends React.Component {
     fetchDataChoro()
       .then((data) => {
         this.setState({
-          data: data
+          data: data.data
         })
         this.createMap()
       })
@@ -91,8 +93,8 @@ class ChoroplethMap extends React.Component {
     return (
       <div
         id='cloropleth_map' style={{
-          height: '100%',
-          width: '100%'
+          position: 'relative',
+          margin: '0 auto'
         }}
       />)
   }

@@ -40,6 +40,13 @@ code {
   margin: auto;
 }
 
+/* .cloropleth {
+  position: relative;
+  width: 80%;
+  max-height: 700px;
+  margin: auto;
+} */
+
 /* Simple responsivenss example */
 @media (min-width: 1400px) {
   .sub-double.chart-wrapper {

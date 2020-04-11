@@ -89,9 +89,7 @@ class App extends React.Component {
               />
             </div>
           </div>}
-        <div className='main chart-wrapper'>
-          <ChoroplethMap />
-        </div>
+        <ChoroplethMap />
       </div>
     )
   }

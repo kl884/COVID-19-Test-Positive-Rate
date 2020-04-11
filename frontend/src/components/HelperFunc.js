@@ -42,7 +42,6 @@ async function fetchDataChoro () {
 async function getData (state) {
   const data = []
   const fetchedData = await fetchData(state)
-  console.log(fetchedData.data)
   data.push({
     title: `${state} State COVID-19 Test Positive Rate`,
     data: fetchedData.data.map((row) => {
