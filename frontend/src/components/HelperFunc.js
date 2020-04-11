@@ -32,8 +32,14 @@ async function fetchData (state) {
   })
   return data.json()
 }
+async function fetchDataChoro () {
+  const data = await fetch('http://54.244.209.103/api/data?choropleth=true'. {
+    method: 'GET'
+  })
+  return data.json()
+}
 
-export async function getData (state) {
+async function getData (state) {
   const data = []
   const fetchedData = await fetchData(state)
   console.log(fetchedData.data)
@@ -85,4 +91,9 @@ export async function getData (state) {
   })
 
   return data
+}
+
+export {
+  getData,
+  fetchDataChoro
 }

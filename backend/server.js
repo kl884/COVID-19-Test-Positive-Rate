@@ -40,10 +40,34 @@ const convertToJson = function (state) {
   })
 }
 
+const convertToJsonChoro = function (data) {
+  return new Promise((resolve, reject) => {
+    const result = []
+    const numDataNeeded = 56
+    let dataSoFar = 0
+    const readStream = fs.createReadStream('data.csv')
+    readStream
+      .pipe(csv())
+      .on('data', (data) => {
+        if (dataSoFar === numDataNeeded) return
+        result.push([data.state, parseFloat(data.total_pos_rate)])
+        dataSoFar++
+      })
+      .on('end', () => {
+        resolve(result)
+      })
+  })
+}
+
 router.get('/data', async (req, res) => {
   console.log('fetching data request')
   // const fetchedData = await fetchCsv()
-  const dataArray = await convertToJson(req.query.state)
+  let dataArray = null
+  if (req.query.choropleth === 'true') {
+    dataArray = await convertToJsonChoro()
+  } else {
+    dataArray = await convertToJson(req.query.state)
+  }
   const responseBody = {
     data: dataArray
   }

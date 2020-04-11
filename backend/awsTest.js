@@ -80,6 +80,44 @@ const convertToJsonFile = function (data) {
   })
 }
 
+const convertToJsonChoro = async function () {
+  const result = []
+  const numDataNeeded = 56
+  let dataSoFar = 0
+  const readStream = fs.createReadStream('../python/test.csv')
+  readStream
+    .pipe(csv())
+    .on('data', (data) => {
+      if (dataSoFar === numDataNeeded) return
+      result.push([data.state, parseFloat(data.total_pos_rate)])
+      dataSoFar++
+    })
+    .on('end', () => {
+      console.log('readStream ended, ')
+      return result
+    })
+}
+
+const convertToJsonFileChoroTwo = function (data) {
+  return new Promise((resolve, reject) => {
+    const result = []
+    const numDataNeeded = 56
+    let dataSoFar = 0
+    const readStream = fs.createReadStream('../python/test.csv')
+    readStream
+      .pipe(csv())
+      .on('data', (data) => {
+        if (dataSoFar === numDataNeeded) return
+        result.push([data.state, parseFloat(data.total_pos_rate)])
+        dataSoFar++
+      })
+      .on('end', () => {
+        console.log('readStream ended, ')
+        resolve(result)
+      })
+  })
+}
+
 // assumeRole()
 //   .then(fetchCsv)
 //   .then(convertToJson)
@@ -90,7 +128,18 @@ const convertToJsonFile = function (data) {
 //     console.log('error: ', error)
 //   })
 
-convertToJsonFile()
-  .then((result) => {
-    console.log(result)
-  })
+// convertToJsonFile()
+//   .then((result) => {
+//     console.log(result)
+//   })
+
+// async function mainTest () {
+//   const result = await convertToJsonChoro()
+//   console.log(result)
+// }
+
+// mainTest()
+
+convertToJsonFileChoroTwo().then((result) => {
+  console.log(result)
+})

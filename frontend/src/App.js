@@ -3,6 +3,7 @@ import Chart from 'chart.js'
 import { CumulChart, DailyChart, PredDailyChart, PredCumulChart } from './components/Graphs.js'
 import { getData } from './components/HelperFunc.js'
 import ComboBox from './components/AutoCompleteBar.js'
+import ChoroplethMap from './components/ChroplethMap.js'
 Chart.defaults.global.defaultFontFamily = 'Roboto, sans-serif'
 
 // App
@@ -68,26 +69,29 @@ class App extends React.Component {
               />
             </div>
           </div>}
-        {this.state.data && <div className='sub-double chart-wrapper'>
-          <div style={{ height: 300 }}>
-            <PredDailyChart
-              dataModel={this.state.data[3].data}
-              dataActual={this.state.data[4].data}
-              title={this.state.data[3].title}
-              yLabel='Positive Cases'
-              color='#3E517A'
-            />
-          </div>
-          <div style={{ height: 300 }}>
-            <PredCumulChart
-              dataModel={this.state.data[5].data}
-              dataActual={this.state.data[6].data}
-              title={this.state.data[5].title}
-              color='#3E517A'
-            />
-          </div>
-        </div>}
-
+        {this.state.data &&
+          <div className='sub-double chart-wrapper'>
+            <div style={{ height: 300 }}>
+              <PredDailyChart
+                dataModel={this.state.data[3].data}
+                dataActual={this.state.data[4].data}
+                title={this.state.data[3].title}
+                yLabel='Positive Cases'
+                color='#3E517A'
+              />
+            </div>
+            <div style={{ height: 300 }}>
+              <PredCumulChart
+                dataModel={this.state.data[5].data}
+                dataActual={this.state.data[6].data}
+                title={this.state.data[5].title}
+                color='#3E517A'
+              />
+            </div>
+          </div>}
+        <div className='main chart-wrapper'>
+          <ChoroplethMap />
+        </div>
       </div>
     )
   }
