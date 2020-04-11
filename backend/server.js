@@ -120,11 +120,9 @@ httpsApp.use(function (req, res, next) {
   next()
 })
 httpsApp.use('/line', router)
-if (process.env.NODE_ENV === 'prod') {
-  const options = {
-    key: fs.readFileSync('/home/ubuntu/ssl/private.key', 'utf8'),
-    cert: fs.readFileSync('/home/ubuntu/ssl/certificate.crt', 'utf8'),
-    ca: fs.readFileSync('/home/ubuntu/ssl/ca_bundle.crt', 'utf8')
-  }
-  https.createServer(options, httpsApp).listen(443, () => console.log('https server ready at 443!'))
+const optionshttps = {
+  key: fs.readFileSync('/home/ubuntu/ssl/private.key', 'utf8'),
+  cert: fs.readFileSync('/home/ubuntu/ssl/certificate.crt', 'utf8'),
+  ca: fs.readFileSync('/home/ubuntu/ssl/ca_bundle.crt', 'utf8')
 }
+https.createServer(optionshttps, httpsApp).listen(443, () => console.log('https server ready at 443!'))
