@@ -11,25 +11,45 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.App {
+  padding: 4% 0%;
+}
+
+
 
 .chart-wrapper {
   padding: 2%;
-  display: inline-block;
+  display:inline-block;
+  vertical-align: top;
+  width: 96%;
 }
 
-.main.chart-wrapper {
-  width: 96%;
-  height: 400px;
-}
+/* .main.chart-wrapper {
+} */
 
 .sub.chart-wrapper {
   width: 29%;
   height: 300px;
 }
 
+.sub-double.chart-wrapper {
+  height:600px;
+}
+
+.combo-box-demo {
+  margin: auto;
+}
+
+/* .cloropleth {
+  position: relative;
+  width: 80%;
+  max-height: 700px;
+  margin: auto;
+} */
+
 /* Simple responsivenss example */
-@media (max-width: 700px) {
-  .sub.chart-wrapper {
-    width: 96%;
+@media (min-width: 1400px) {
+  .sub-double.chart-wrapper {
+    width: 46%;
   }
 }
