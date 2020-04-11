@@ -100,7 +100,7 @@ http.createServer(app).listen(80, () => console.log('http server ready at 80'))
 const httpsApp = express()
 const httpsRouter = express.Router()
 
-httpsRouter.get('/', function (req, res) {
+httpsRouter.post('/', function (req, res) {
   console.log('verify line webhook called')
   res.status(200).send('Verification endpoint status 200')
 })
