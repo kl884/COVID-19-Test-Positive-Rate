@@ -123,7 +123,7 @@ httpsApp.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Credentials', true)
   next()
 })
-httpsApp.use('/line', router)
+httpsApp.use('/line', httpsRouter)
 const optionshttps = {
   key: fs.readFileSync('/home/ubuntu/ssl/private.key', 'utf8'),
   cert: fs.readFileSync('/home/ubuntu/ssl/certificate.crt', 'utf8'),
