@@ -75,14 +75,6 @@ router.get('/data', async (req, res) => {
   return res.json(responseBody)
 })
 
-router.get('/line', async function (req, res) {
-  console.log('line webhook called')
-  responseBody = {
-    data: 'cool'
-  }
-  return res.json(responseBody)
-})
-
 app.use(bodyParser.urlencoded({
   extended: true
 }))
@@ -105,11 +97,34 @@ app.get('/*', function (req, res) {
 })
 http.createServer(app).listen(80, () => console.log('http server ready at 80'))
 
+const httpsApp = express()
+const httpsRouter = express.Router()
+
+httpsRouter.get('/test', async function (req, res) {
+  console.log('test line webhook called')
+  const responseBody = {
+    data: 'cool'
+  }
+  return res.json(responseBody)
+})
+httpsApp.use(bodyParser.urlencoded({
+  extended: true
+}))
+httpsApp.use(bodyParser.json())
+
+httpsApp.use(function (req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Credentials', true)
+  next()
+})
+httpsApp.use('/line', router)
 if (process.env.NODE_ENV === 'prod') {
   const options = {
     key: fs.readFileSync('/home/ubuntu/ssl/private.key', 'utf8'),
     cert: fs.readFileSync('/home/ubuntu/ssl/certificate.crt', 'utf8'),
     ca: fs.readFileSync('/home/ubuntu/ssl/ca_bundle.crt', 'utf8')
   }
-  https.createServer(options, app).listen(443, () => console.log('https server ready at 443!'))
+  https.createServer(options, httpsApp).listen(443, () => console.log('https server ready at 443!'))
 }
