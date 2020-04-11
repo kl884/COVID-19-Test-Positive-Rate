@@ -102,7 +102,7 @@ const httpsRouter = express.Router()
 
 httpsRouter.get('/', function (req, res) {
   console.log('verify line webhook called')
-  res.send(200)
+  res.status(200).send('Verification endpoint status 200')
 })
 httpsRouter.get('/test', async function (req, res) {
   console.log('test line webhook called')
