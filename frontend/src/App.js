@@ -3,7 +3,7 @@ import Chart from 'chart.js'
 import { CumulChart, DailyChart, PredDailyChart, PredCumulChart } from './components/Graphs.js'
 import { getData } from './components/HelperFunc.js'
 import ComboBox from './components/AutoCompleteBar.js'
-import ChoroplethMap from './components/ChroplethMap.js'
+import ChoroplethMap from './components/ChoroplethMap.js'
 Chart.defaults.global.defaultFontFamily = 'Roboto, sans-serif'
 
 // App

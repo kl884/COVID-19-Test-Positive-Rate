@@ -33,7 +33,7 @@ async function fetchData (state) {
   return data.json()
 }
 async function fetchDataChoro () {
-  const data = await fetch('http://54.244.209.103/api/data?choropleth=true'. {
+  const data = await fetch('http://54.244.209.103/api/data?choropleth=true', {
     method: 'GET'
   })
   return data.json()
