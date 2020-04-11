@@ -26,13 +26,26 @@ class CumulChart extends React.Component {
         legend: {
           display: false
         },
+        tooltips: {
+          callbacks: {
+            label: function (tooltipItem, data) {
+              let label = ''
+              label += Math.round(tooltipItem.yLabel * 100) / 100
+              label += '%'
+              return label
+            }
+          }
+        },
         maintainAspectRatio: false,
         scales: {
           xAxes: [
             {
               type: 'time',
               time: {
-                unit: 'week'
+                unit: 'week',
+                displayFormats: {
+                  week: 'M-D'
+                }
               }
             }
           ],
@@ -96,12 +109,32 @@ class DailyChart extends React.Component {
           display: false
         },
         maintainAspectRatio: false,
+        tooltips: {
+          callbacks: {
+            label: function (tooltipItem, data) {
+              let label = data.datasets[tooltipItem.datasetIndex].label || ''
+              if (label) {
+                label += ': '
+              }
+              if (tooltipItem.datasetIndex === 0) {
+                label += Math.round(tooltipItem.yLabel * 100) / 100
+                label += '%'
+              } else {
+                label += tooltipItem.yLabel
+              }
+              return label
+            }
+          }
+        },
         scales: {
           xAxes: [
             {
               type: 'time',
               time: {
-                unit: 'week'
+                unit: 'week',
+                displayFormats: {
+                  week: 'M-D'
+                }
               }
             }
           ],
@@ -207,7 +240,10 @@ class PredDailyChart extends React.Component {
             {
               type: 'time',
               time: {
-                unit: 'week'
+                unit: 'week',
+                displayFormats: {
+                  week: 'M-D'
+                }
               }
             }
           ],
@@ -303,7 +339,10 @@ class PredCumulChart extends React.Component {
             {
               type: 'time',
               time: {
-                unit: 'week'
+                unit: 'week',
+                displayFormats: {
+                  week: 'M-D'
+                }
               }
             }
           ],

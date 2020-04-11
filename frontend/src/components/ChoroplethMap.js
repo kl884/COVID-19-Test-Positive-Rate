@@ -55,7 +55,7 @@ class ChoroplethMap extends React.Component {
           // tooltip content
           return ['<div class="hoverinfo">',
             '<strong>', geo.properties.name, '</strong>',
-            '<br>Total Positive Rate: <strong>', data.numberOfThings, '</strong>',
+            '<br>Total Positive Rate: <strong>', data.numberOfThings.toFixed(1), '%</strong>',
             '</div>'].join('')
         }
       },
