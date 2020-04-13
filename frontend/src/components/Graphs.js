@@ -137,6 +137,8 @@ class DailyChart extends React.Component {
     this.myChart.data.labels = this.props.dataRate.map(d => d.time)
     this.myChart.data.datasets[0].data = this.props.dataRate.map(d => d.value)
     this.myChart.data.datasets[1].data = this.props.dataVol.map(d => d.value)
+    this.myChart.data.datasets[0].label = this.props.titleRate
+    this.myChart.data.datasets[1].label = this.props.titleVol
     this.myChart.update()
   }
 
@@ -485,6 +487,9 @@ class StackedChart extends React.Component {
     this.myChart.data.datasets[2].data = this.props.dataActive.map(d => d.value)
     this.myChart.data.datasets[0].data = this.props.dataDeath.map(d => d.value)
     this.myChart.data.datasets[1].data = this.props.dataRecovered.map(d => d.value)
+    this.myChart.data.datasets[0].label = this.props.titleDeath
+    this.myChart.data.datasets[1].label = this.props.titleRecovered
+    this.myChart.data.datasets[2].label = this.props.titleActive
     this.myChart.update()
   }
 
