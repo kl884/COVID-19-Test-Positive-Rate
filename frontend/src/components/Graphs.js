@@ -67,6 +67,7 @@ class CumulChart extends React.Component {
           }
         },
         tooltips: {
+          intersect: false,
           callbacks: {
             label: function (tooltipItem, data) {
               let label = 'Test Positive Rate: '
@@ -176,6 +177,7 @@ class DailyChart extends React.Component {
         },
         maintainAspectRatio: false,
         tooltips: {
+          intersect: false,
           mode: 'index',
           callbacks: {
             label: function (tooltipItem, data) {
@@ -525,6 +527,7 @@ class StackedChart extends React.Component {
         },
         maintainAspectRatio: false,
         tooltips: {
+          intersect: false,
           mode: 'index',
           callbacks: {
             label: function (tooltipItem, data) {
