@@ -2,7 +2,7 @@ import pandas as pd
 import dateutil.parser
 import os
 
-COLUMNS_FOR_POS_TREND = ['state','positive','positiveIncrease','totalTestResultsIncrease','total','dateChecked']
+COLUMNS_FOR_POS_TREND = ['state','positive','positiveIncrease','totalTestResultsIncrease','total','dateChecked','death','recovered']
 RELATIVE_PATH_CSV = ('./test.csv','/home/ubuntu/project/COVID-19-Test-Positive-Rate/backend/data.csv')[os.environ.get('PYTHON_ENVIRONMENT') == 'prod']
 
 # for choropleth graph
@@ -31,7 +31,12 @@ def slice_state(df, state=None):
         'date':list(map(lambda date: dateutil.parser.parse(date).timestamp()*1000, df['dateChecked'])), 
         
         'totalTestResultsIncrease':df['totalTestResultsIncrease'],
-        'positive': df['positive'].fillna(0).round(0).astype(int)
+        'positive': df['positive'].fillna(0).round(0).astype(int),
+
+        # stack plot
+        'active': df['positive'] - df['death'] - df['recovered'],
+        'death': df['death'],
+        'recovered': df['recovered']
     }
     result_df = pd.DataFrame(data_for_graph)
     result_df.to_csv(RELATIVE_PATH_CSV, index=False, header=True)

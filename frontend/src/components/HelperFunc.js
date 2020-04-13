@@ -43,7 +43,7 @@ async function getData (state) {
   const data = []
   const fetchedData = await fetchData(state)
   data.push({
-    title: `${state} State COVID-19 Test Positive Rate`,
+    title: `${state} State Test Positive Rate (%)`,
     data: fetchedData.data.map((row) => {
       return {
         time: row.date,
@@ -53,7 +53,7 @@ async function getData (state) {
   })
 
   data.push({
-    title: 'DailyTestPos',
+    title: `${state} State Daily Test Positive Rate (%)`,
     data: fetchedData.data.map((row) => {
       return {
         time: row.date,
@@ -63,7 +63,7 @@ async function getData (state) {
   })
 
   data.push({
-    title: 'DailyTestVol',
+    title: `${state} State Daily Test Volume (Count)`,
     data: fetchedData.data.map((row) => {
       return {
         time: row.date,
@@ -73,7 +73,7 @@ async function getData (state) {
   })
 
   data.push({
-    title: `${state} State COVID-19 Daily New Cases Prediction`,
+    title: `${state} State Daily New Cases Prediction`,
     data: getRandomDateArray(40, 0, 30000)
   })
   data.push({
@@ -87,6 +87,36 @@ async function getData (state) {
   data.push({
     title: 'CumulCaseActual',
     data: getRandomDateArray(20, 0, 30000)
+  })
+
+  data.push({
+    title: `${state} State Recovered (Count)`,
+    data: fetchedData.data.map((row) => {
+      return {
+        time: row.date,
+        value: row.recovered
+      }
+    })
+  })
+
+  data.push({
+    title: `${state} State Death (Count)`,
+    data: fetchedData.data.map((row) => {
+      return {
+        time: row.date,
+        value: row.death
+      }
+    })
+  })
+
+  data.push({
+    title: `${state} State Active (Count)`,
+    data: fetchedData.data.map((row) => {
+      return {
+        time: row.date,
+        value: row.active
+      }
+    })
   })
 
   return data
