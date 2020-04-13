@@ -128,10 +128,10 @@ const convertToJsonFileChoroTwo = function (data) {
 //     console.log('error: ', error)
 //   })
 
-// convertToJsonFile()
-//   .then((result) => {
-//     console.log(result)
-//   })
+convertToJsonFile()
+  .then((result) => {
+    console.log(result)
+  })
 
 // async function mainTest () {
 //   const result = await convertToJsonChoro()
@@ -140,6 +140,6 @@ const convertToJsonFileChoroTwo = function (data) {
 
 // mainTest()
 
-convertToJsonFileChoroTwo().then((result) => {
-  console.log(result)
-})
+// convertToJsonFileChoroTwo().then((result) => {
+//   console.log(result)
+// })

@@ -183,3 +183,40 @@ button{
  
   color:black;
 }
+
+/* dialog box */
+.dialog-box {
+  background: #FFFAE5;
+  box-sizing: border-box;
+  padding: 16px 24px;
+  margin: 32px auto;
+  position: relative;
+  border-radius: 40px;
+  max-width: 800px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.dialog-box p {
+  font-weight: 800;
+  font-size: 1rem;
+  color: #837865;
+  letter-spacing: 0.2px;
+  line-height: 1.8rem;
+}
+
+.dialog-box b,
+.dialog-box a {
+  color: #0AB5CD;
+  transition: 0.2s all;
+}
+
+.dialog-box .dialog-box__name {
+  position: absolute;
+  left: 16px;
+  top: -28px;
+  font-size: 1rem;
+  color: #BA3B1F;
+  padding: 4px 16px;
+  background: #FF9A40;
+  border-radius: 40px;
+}

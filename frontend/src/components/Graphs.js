@@ -222,7 +222,12 @@ class DailyChart extends React.Component {
               ticks: {
                 min: 0,
                 fontColor: '#1E8449',
-                maxTicksLimit: 5
+                maxTicksLimit: 5,
+                callback: function (value, index, values) {
+                  if (value > 1000) {
+                    return value / 1000 + 'k'
+                  }
+                }
               },
               display: true,
               position: 'right',
@@ -475,9 +480,9 @@ class StackedChart extends React.Component {
 
   componentDidUpdate () {
     this.myChart.data.labels = this.props.dataActive.map(d => d.time)
-    this.myChart.data.datasets[0].data = this.props.dataActive.map(d => d.value)
-    this.myChart.data.datasets[1].data = this.props.dataDeath.map(d => d.value)
-    this.myChart.data.datasets[2].data = this.props.dataRecovered.map(d => d.value)
+    this.myChart.data.datasets[2].data = this.props.dataActive.map(d => d.value)
+    this.myChart.data.datasets[0].data = this.props.dataDeath.map(d => d.value)
+    this.myChart.data.datasets[1].data = this.props.dataRecovered.map(d => d.value)
     this.myChart.update()
   }
 
@@ -493,25 +498,23 @@ class StackedChart extends React.Component {
           display: true,
           labels: {
             // usePointStyle: true
+          },
+          onClick: function (e, legendItem) {
+            // const datasetIndex = legendItem.datasetIndex
+            const ci = this.chart
+            const meta = ci.getDatasetMeta(0)
+            if (!meta.showAllPoint) {
+              ci.data.datasets[0].pointRadius = 0
+              ci.data.datasets[1].pointRadius = 0
+              ci.data.datasets[2].pointRadius = 0
+            } else {
+              ci.data.datasets[0].pointRadius = 2
+              ci.data.datasets[1].pointRadius = 2
+              ci.data.datasets[2].pointRadius = 2
+            }
+            meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+            ci.update()
           }
-          // onClick: function (e, legendItem) {
-          //   // const datasetIndex = legendItem.datasetIndex
-          //   const ci = this.chart
-          //   const meta = ci.getDatasetMeta(0)
-          //   if (meta.showAllPoint) {
-          //     ci.data.datasets[0].pointRadius = function (context) {
-          //       return context.dataIndex < 3 ? 2 : 0
-          //     }
-          //     ci.data.datasets[1].pointRadius = function (context) {
-          //       return context.dataIndex < 3 ? 2 : 0
-          //     }
-          //   } else {
-          //     ci.data.datasets[0].pointRadius = 2
-          //     ci.data.datasets[1].pointRadius = 2
-          //   }
-          //   meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
-          //   ci.update()
-          // }
         },
         maintainAspectRatio: false,
         tooltips: {
@@ -522,12 +525,8 @@ class StackedChart extends React.Component {
               if (label) {
                 label += ': '
               }
-              if (tooltipItem.datasetIndex === 0) {
-                label += Math.round(tooltipItem.yLabel * 100) / 100
-                label += '%'
-              } else {
-                label += tooltipItem.yLabel
-              }
+
+              label += tooltipItem.yLabel
               return label
             },
             labelColor: function (tooltipItem, data) {
@@ -539,52 +538,57 @@ class StackedChart extends React.Component {
           xAxes: [
             defaultSetting({ ticksMax: this.props.dataActive[0], ticksMin: this.props.dataActive[this.props.dataActive.length - 1] })
           ],
-          y: {
-            stacked: true
-          }
+          yAxes: [
+            {
+              ticks: {
+                maxTicksLimit: 5,
+                callback: function (value, index, values) {
+                  if (value > 1000) {
+                    return value / 1000 + 'k'
+                  }
+                }
+              },
+              stacked: true
+            }
+          ]
         }
       },
       data: {
         labels: this.props.dataActive.map(d => d.time),
-        datasets: [{
-          yAxisID: 'y-axis-1',
-          label: this.props.titleActive,
-          data: this.props.dataActive.map(d => d.value), // d is array of objects with properties time and value
-          fill: 'none',
-          backgroundColor: '#3498DB',
-          pointRadius: 0,
-          pointBorderWidth: 1,
-          pointBackgroundColor: '#FFFFFF ',
-          pointHoverBackgroundColor: '#3498DB',
-          borderColor: '#3498DB',
-          borderWidth: 1
-        },
-        {
-          yAxisID: 'y-axis-2',
-          label: this.props.titleDeath,
-          data: this.props.dataDeath.map(d => d.value), // d is array of objects with properties time and value
-          fill: 'none',
-          backgroundColor: '#E74C3C',
-          pointRadius: 0,
-          pointBorderWidth: 1,
-          pointBackgroundColor: '#FFFFFF ',
-          pointHoverBackgroundColor: '#E74C3C',
-          borderColor: '#E74C3C',
-          borderWidth: 1
-        },
-        {
-          yAxisID: 'y-axis-3',
-          label: this.props.titleRecovered,
-          data: this.props.dataRecovered.map(d => d.value), // d is array of objects with properties time and value
-          fill: 'none',
-          backgroundColor: '#2ECC71',
-          pointRadius: 0,
-          pointBorderWidth: 1,
-          pointBackgroundColor: '#FFFFFF ',
-          pointHoverBackgroundColor: '#2ECC71',
-          borderColor: '#2ECC71',
-          borderWidth: 1
-        }
+        datasets: [
+          {
+            label: this.props.titleDeath,
+            data: this.props.dataDeath.map(d => d.value), // d is array of objects with properties time and value
+            backgroundColor: '#E74C3C',
+            pointRadius: 2,
+            pointBorderWidth: 1,
+            pointBackgroundColor: '#FFFFFF ',
+            pointHoverBackgroundColor: '#E74C3C',
+            borderColor: '#E74C3C',
+            borderWidth: 1
+          },
+          {
+            label: this.props.titleRecovered,
+            data: this.props.dataRecovered.map(d => d.value), // d is array of objects with properties time and value
+            backgroundColor: '#2ECC71',
+            pointRadius: 2,
+            pointBorderWidth: 1,
+            pointBackgroundColor: '#FFFFFF ',
+            pointHoverBackgroundColor: '#2ECC71',
+            borderColor: '#2ECC71',
+            borderWidth: 1
+          },
+          {
+            label: this.props.titleActive,
+            data: this.props.dataActive.map(d => d.value), // d is array of objects with properties time and value
+            backgroundColor: '#3498DB',
+            pointRadius: 2,
+            pointBorderWidth: 1,
+            pointBackgroundColor: '#FFFFFF ',
+            pointHoverBackgroundColor: '#3498DB',
+            borderColor: '#3498DB',
+            borderWidth: 1
+          }
         ]
       }
     })

@@ -31,12 +31,12 @@ def slice_state(df, state=None):
         'date':list(map(lambda date: dateutil.parser.parse(date).timestamp()*1000, df['dateChecked'])), 
         
         'totalTestResultsIncrease':df['totalTestResultsIncrease'],
-        'positive': df['positive'].fillna(0).round(0).astype(int),
+        'positive': df['positive'].fillna(0),
 
         # stack plot
-        'active': df['positive'] - df['death'] - df['recovered'],
-        'death': df['death'],
-        'recovered': df['recovered']
+        'death': df['death'].fillna(0),
+        'recovered': df['recovered'].fillna(0),
+        'active': df['positive'].fillna(0) - df['death'].fillna(0) - df['recovered'].fillna(0)
     }
     result_df = pd.DataFrame(data_for_graph)
     result_df.to_csv(RELATIVE_PATH_CSV, index=False, header=True)
