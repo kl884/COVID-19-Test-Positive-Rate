@@ -224,8 +224,10 @@ class DailyChart extends React.Component {
                 fontColor: '#1E8449',
                 maxTicksLimit: 5,
                 callback: function (value, index, values) {
-                  if (value > 1000) {
+                  if (value >= 1000) {
                     return value / 1000 + 'k'
+                  } else {
+                    return value
                   }
                 }
               },
@@ -530,7 +532,8 @@ class StackedChart extends React.Component {
               return label
             },
             labelColor: function (tooltipItem, data) {
-              return tooltipItem.datasetIndex === 0 ? { backgroundColor: '#FF2D00' } : { backgroundColor: '#1E8449' }
+              return tooltipItem.datasetIndex === 0 ? { backgroundColor: '#E74C3C' }
+                : tooltipItem.datasetIndex === 1 ? { backgroundColor: '#2ECC71' } : { backgroundColor: '#3498DB' }
             }
           }
         },
@@ -543,8 +546,10 @@ class StackedChart extends React.Component {
               ticks: {
                 maxTicksLimit: 5,
                 callback: function (value, index, values) {
-                  if (value > 1000) {
+                  if (value >= 1000) {
                     return value / 1000 + 'k'
+                  } else {
+                    return value
                   }
                 }
               },
