@@ -46,6 +46,7 @@ class CumulChart extends React.Component {
           display: false,
           text: this.props.title
         },
+        events: ['click', 'touchstart'],
         legend: {
           display: true,
           labels: {
@@ -527,7 +528,7 @@ class StackedChart extends React.Component {
         },
         maintainAspectRatio: false,
         tooltips: {
-          intersect: false,
+          intersect: true,
           mode: 'index',
           callbacks: {
             label: function (tooltipItem, data) {
