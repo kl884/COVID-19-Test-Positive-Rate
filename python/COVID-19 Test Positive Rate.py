@@ -245,7 +245,10 @@ population['state']= list
 
 
 def state_model(df, state, bass_df= False):
-    # Returns a dataframe contains state's actual data and modeled data 
+    # If bass_df == True:
+    #     Returns a dataframe contains state's actual data and modeled data and varfinal[M,p,q]
+    # If bass_df == False (default):
+    #     Print M, p, q and plot the actual modeled data
     
     df_state= slice_state(df, state)
     state_pop= int(population['POPESTIMATE2019'].loc[population.state == state])
@@ -307,48 +310,49 @@ def state_model(df, state, bass_df= False):
     cofactor= np.exp(-(p+q)*tp)
     df_Y['positiveIncrease_pdf']= m*(((p+q)**2/p)*cofactor)/(1+(q/p)*cofactor)**2
 
-    # daily new case plot
-    #plt.plot(df_Y['date'], df_Y['positiveIncrease_pdf'], df_Y['date'], df_Y['positiveIncrease'])
-    #plt.title('positiveIncrease_pdf')
-    #plt.legend(['Model', 'Actual'])
-    #plt.show()
-
-    sns.reset_orig()
-    date_form= mdates.DateFormatter("%m-%d")
-    weekday= SU
-    state= 'NY'
-
-    fig0, ax0= plt.subplots(figsize=(8.4, 5))
-    plt.plot(df_Y['date'], df_Y['positiveIncrease_pdf'], df_Y['date'], df_Y['positiveIncrease'])
-    ax0.fmt_xdata= date_form # mdates.DateFormatter('%m-%d')
-    ax0.grid()
-    ax0.legend(['Model', 'Actual'])
-    ax0.set(ylabel= 'Positive Cases', title= state + ' State COVID-19 Daily New Cases Prediction')
-    fig0.autofmt_xdate()    
-    ax0.xaxis.set_major_formatter(date_form)
-    ax0.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday= weekday))
-    plt.show()
-
-    # Cumulative positive cases (cdf)
-    df_Y['positive_cdf'] = m*(1-cofactor)/(1+(q/p)*cofactor)
-    #plt.plot(tp, positive_cdf, t, c_Y)
-    #plt.title('Positive Cases cdf')
-    #plt.legend(['Model', 'Actual'])
-    #plt.show()
-
-    fig1, ax1= plt.subplots(figsize=(8.4, 5))
-    plt.plot(df_Y['date'], df_Y['positive_cdf'], df_Y['date'], df_Y['positive'])
-    ax1.fmt_xdata= date_form # mdates.DateFormatter('%m-%d')
-    ax1.grid()
-    ax1.legend(['Model', 'Actual'])
-    ax1.set(ylabel= 'Cumulative Positive Cases', title= state + ' State COVID-19 Cumulative Cases Prediction')
-    fig1.autofmt_xdate()    
-    ax1.xaxis.set_major_formatter(date_form)
-    ax1.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday= weekday))
-    plt.show()
-    
     if bass_df == True:
-        return df_Y
+        return df_Y, varfinal
+    
+    if bass_df == False:    
+        # daily new case plot
+        #plt.plot(df_Y['date'], df_Y['positiveIncrease_pdf'], df_Y['date'], df_Y['positiveIncrease'])
+        #plt.title('positiveIncrease_pdf')
+        #plt.legend(['Model', 'Actual'])
+        #plt.show()
+
+        sns.reset_orig()
+        date_form= mdates.DateFormatter("%m-%d")
+        weekday= SU
+        state= 'NY'
+
+        fig0, ax0= plt.subplots(figsize=(8.4, 5))
+        plt.plot(df_Y['date'], df_Y['positiveIncrease_pdf'], df_Y['date'], df_Y['positiveIncrease'])
+        ax0.fmt_xdata= date_form # mdates.DateFormatter('%m-%d')
+        ax0.grid()
+        ax0.legend(['Model', 'Actual'])
+        ax0.set(ylabel= 'Positive Cases', title= state + ' State COVID-19 Daily New Cases Prediction')
+        fig0.autofmt_xdate()    
+        ax0.xaxis.set_major_formatter(date_form)
+        ax0.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday= weekday))
+        plt.show()
+
+        # Cumulative positive cases (cdf)
+        df_Y['positive_cdf'] = m*(1-cofactor)/(1+(q/p)*cofactor)
+        #plt.plot(tp, positive_cdf, t, c_Y)
+        #plt.title('Positive Cases cdf')
+        #plt.legend(['Model', 'Actual'])
+        #plt.show()
+
+        fig1, ax1= plt.subplots(figsize=(8.4, 5))
+        plt.plot(df_Y['date'], df_Y['positive_cdf'], df_Y['date'], df_Y['positive'])
+        ax1.fmt_xdata= date_form # mdates.DateFormatter('%m-%d')
+        ax1.grid()
+        ax1.legend(['Model', 'Actual'])
+        ax1.set(ylabel= 'Cumulative Positive Cases', title= state + ' State COVID-19 Cumulative Cases Prediction')
+        fig1.autofmt_xdate()    
+        ax1.xaxis.set_major_formatter(date_form)
+        ax1.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday= weekday))
+        plt.show()
 
 
 # # User Interface

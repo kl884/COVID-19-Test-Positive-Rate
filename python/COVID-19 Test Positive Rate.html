@@ -12377,7 +12377,10 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">state_model</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">bass_df</span><span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-    <span class="c1"># Returns a dataframe contains state&#39;s actual data and modeled data </span>
+    <span class="c1"># If bass_df == True:</span>
+    <span class="c1">#     Returns a dataframe contains state&#39;s actual data and modeled data and varfinal[M,p,q]</span>
+    <span class="c1"># If bass_df == False (default):</span>
+    <span class="c1">#     Print M, p, q and plot the actual modeled data</span>
     
     <span class="n">df_state</span><span class="o">=</span> <span class="n">slice_state</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
     <span class="n">state_pop</span><span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">population</span><span class="p">[</span><span class="s1">&#39;POPESTIMATE2019&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">population</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">state</span><span class="p">])</span>
@@ -12439,48 +12442,49 @@ div#notebook {
     <span class="n">cofactor</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="n">q</span><span class="p">)</span><span class="o">*</span><span class="n">tp</span><span class="p">)</span>
     <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;positiveIncrease_pdf&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">m</span><span class="o">*</span><span class="p">(((</span><span class="n">p</span><span class="o">+</span><span class="n">q</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="n">cofactor</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="n">q</span><span class="o">/</span><span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="n">cofactor</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
 
-    <span class="c1"># daily new case plot</span>
-    <span class="c1">#plt.plot(df_Y[&#39;date&#39;], df_Y[&#39;positiveIncrease_pdf&#39;], df_Y[&#39;date&#39;], df_Y[&#39;positiveIncrease&#39;])</span>
-    <span class="c1">#plt.title(&#39;positiveIncrease_pdf&#39;)</span>
-    <span class="c1">#plt.legend([&#39;Model&#39;, &#39;Actual&#39;])</span>
-    <span class="c1">#plt.show()</span>
-
-    <span class="n">sns</span><span class="o">.</span><span class="n">reset_orig</span><span class="p">()</span>
-    <span class="n">date_form</span><span class="o">=</span> <span class="n">mdates</span><span class="o">.</span><span class="n">DateFormatter</span><span class="p">(</span><span class="s2">&quot;%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">weekday</span><span class="o">=</span> <span class="n">SU</span>
-    <span class="n">state</span><span class="o">=</span> <span class="s1">&#39;NY&#39;</span>
-
-    <span class="n">fig0</span><span class="p">,</span> <span class="n">ax0</span><span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">8.4</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;positiveIncrease_pdf&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;positiveIncrease&#39;</span><span class="p">])</span>
-    <span class="n">ax0</span><span class="o">.</span><span class="n">fmt_xdata</span><span class="o">=</span> <span class="n">date_form</span> <span class="c1"># mdates.DateFormatter(&#39;%m-%d&#39;)</span>
-    <span class="n">ax0</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
-    <span class="n">ax0</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Model&#39;</span><span class="p">,</span> <span class="s1">&#39;Actual&#39;</span><span class="p">])</span>
-    <span class="n">ax0</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span> <span class="s1">&#39;Positive Cases&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span> <span class="n">state</span> <span class="o">+</span> <span class="s1">&#39; State COVID-19 Daily New Cases Prediction&#39;</span><span class="p">)</span>
-    <span class="n">fig0</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>    
-    <span class="n">ax0</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">date_form</span><span class="p">)</span>
-    <span class="n">ax0</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">mdates</span><span class="o">.</span><span class="n">WeekdayLocator</span><span class="p">(</span><span class="n">byweekday</span><span class="o">=</span> <span class="n">weekday</span><span class="p">))</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-    <span class="c1"># Cumulative positive cases (cdf)</span>
-    <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;positive_cdf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">cofactor</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="n">q</span><span class="o">/</span><span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="n">cofactor</span><span class="p">)</span>
-    <span class="c1">#plt.plot(tp, positive_cdf, t, c_Y)</span>
-    <span class="c1">#plt.title(&#39;Positive Cases cdf&#39;)</span>
-    <span class="c1">#plt.legend([&#39;Model&#39;, &#39;Actual&#39;])</span>
-    <span class="c1">#plt.show()</span>
-
-    <span class="n">fig1</span><span class="p">,</span> <span class="n">ax1</span><span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">8.4</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;positive_cdf&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;positive&#39;</span><span class="p">])</span>
-    <span class="n">ax1</span><span class="o">.</span><span class="n">fmt_xdata</span><span class="o">=</span> <span class="n">date_form</span> <span class="c1"># mdates.DateFormatter(&#39;%m-%d&#39;)</span>
-    <span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
-    <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Model&#39;</span><span class="p">,</span> <span class="s1">&#39;Actual&#39;</span><span class="p">])</span>
-    <span class="n">ax1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span> <span class="s1">&#39;Cumulative Positive Cases&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span> <span class="n">state</span> <span class="o">+</span> <span class="s1">&#39; State COVID-19 Cumulative Cases Prediction&#39;</span><span class="p">)</span>
-    <span class="n">fig1</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>    
-    <span class="n">ax1</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">date_form</span><span class="p">)</span>
-    <span class="n">ax1</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">mdates</span><span class="o">.</span><span class="n">WeekdayLocator</span><span class="p">(</span><span class="n">byweekday</span><span class="o">=</span> <span class="n">weekday</span><span class="p">))</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-    
     <span class="k">if</span> <span class="n">bass_df</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">df_Y</span>
+        <span class="k">return</span> <span class="n">df_Y</span><span class="p">,</span> <span class="n">varfinal</span>
+    
+    <span class="k">if</span> <span class="n">bass_df</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>    
+        <span class="c1"># daily new case plot</span>
+        <span class="c1">#plt.plot(df_Y[&#39;date&#39;], df_Y[&#39;positiveIncrease_pdf&#39;], df_Y[&#39;date&#39;], df_Y[&#39;positiveIncrease&#39;])</span>
+        <span class="c1">#plt.title(&#39;positiveIncrease_pdf&#39;)</span>
+        <span class="c1">#plt.legend([&#39;Model&#39;, &#39;Actual&#39;])</span>
+        <span class="c1">#plt.show()</span>
+
+        <span class="n">sns</span><span class="o">.</span><span class="n">reset_orig</span><span class="p">()</span>
+        <span class="n">date_form</span><span class="o">=</span> <span class="n">mdates</span><span class="o">.</span><span class="n">DateFormatter</span><span class="p">(</span><span class="s2">&quot;%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">weekday</span><span class="o">=</span> <span class="n">SU</span>
+        <span class="n">state</span><span class="o">=</span> <span class="s1">&#39;NY&#39;</span>
+
+        <span class="n">fig0</span><span class="p">,</span> <span class="n">ax0</span><span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">8.4</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;positiveIncrease_pdf&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;positiveIncrease&#39;</span><span class="p">])</span>
+        <span class="n">ax0</span><span class="o">.</span><span class="n">fmt_xdata</span><span class="o">=</span> <span class="n">date_form</span> <span class="c1"># mdates.DateFormatter(&#39;%m-%d&#39;)</span>
+        <span class="n">ax0</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="n">ax0</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Model&#39;</span><span class="p">,</span> <span class="s1">&#39;Actual&#39;</span><span class="p">])</span>
+        <span class="n">ax0</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span> <span class="s1">&#39;Positive Cases&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span> <span class="n">state</span> <span class="o">+</span> <span class="s1">&#39; State COVID-19 Daily New Cases Prediction&#39;</span><span class="p">)</span>
+        <span class="n">fig0</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>    
+        <span class="n">ax0</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">date_form</span><span class="p">)</span>
+        <span class="n">ax0</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">mdates</span><span class="o">.</span><span class="n">WeekdayLocator</span><span class="p">(</span><span class="n">byweekday</span><span class="o">=</span> <span class="n">weekday</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="c1"># Cumulative positive cases (cdf)</span>
+        <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;positive_cdf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">cofactor</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="n">q</span><span class="o">/</span><span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="n">cofactor</span><span class="p">)</span>
+        <span class="c1">#plt.plot(tp, positive_cdf, t, c_Y)</span>
+        <span class="c1">#plt.title(&#39;Positive Cases cdf&#39;)</span>
+        <span class="c1">#plt.legend([&#39;Model&#39;, &#39;Actual&#39;])</span>
+        <span class="c1">#plt.show()</span>
+
+        <span class="n">fig1</span><span class="p">,</span> <span class="n">ax1</span><span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">8.4</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;positive_cdf&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">df_Y</span><span class="p">[</span><span class="s1">&#39;positive&#39;</span><span class="p">])</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">fmt_xdata</span><span class="o">=</span> <span class="n">date_form</span> <span class="c1"># mdates.DateFormatter(&#39;%m-%d&#39;)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Model&#39;</span><span class="p">,</span> <span class="s1">&#39;Actual&#39;</span><span class="p">])</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span> <span class="s1">&#39;Cumulative Positive Cases&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span> <span class="n">state</span> <span class="o">+</span> <span class="s1">&#39; State COVID-19 Cumulative Cases Prediction&#39;</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>    
+        <span class="n">ax1</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">date_form</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">mdates</span><span class="o">.</span><span class="n">WeekdayLocator</span><span class="p">(</span><span class="n">byweekday</span><span class="o">=</span> <span class="n">weekday</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 
 </div>
