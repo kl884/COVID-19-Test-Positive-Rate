@@ -144,7 +144,7 @@ def slice_state(df, state):
     return df_state
 
 
-# In[8]:
+# In[153]:
 
 
 def stackplot_state_case(df, state):
@@ -164,7 +164,7 @@ def stackplot_state_case(df, state):
     sns.set(font_scale= 1.2)
     fig0, ax0= plt.subplots(figsize= (8.4, 5))
     df= df.iloc[::-1]
-    x= list(df['date'])
+    x= [item for item in df['date']]
     y1, y2, y3= df['active'], df['death'], df['recovered']
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
     pal= [sns.xkcd_rgb['denim blue'], sns.xkcd_rgb['pale red'], sns.xkcd_rgb['medium green']]
@@ -226,10 +226,10 @@ def plot_test_pos_rate(df, state):
 
 # # Bass Model Prediction for Cases in NYS
 
-# In[62]:
+# In[155]:
 
 
-population= pd.read_csv('http://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/nst-est2019-alldata.csv?#')
+population= pd.read_csv('https://raw.githubusercontent.com/eestanleyland/COVID-19-Test-Positive-Rate/master/data/nst-est2019-alldata.csv')
 population= population[['NAME', 'POPESTIMATE2019']].copy()
 
 list= ['United States', 'Northeast Region', 'Midwest Region', 'South Region', 'West Region', 
@@ -357,31 +357,31 @@ def state_model(df, state, bass_df= False):
 
 # # User Interface
 
-# In[127]:
+# In[128]:
 
 
-state_model(df, 'FL')
+state_model(df, 'NY')
 
 
-# In[15]:
+# In[154]:
 
 
 state_trend(df, 'NY', plot= 'case')
 
 
-# In[16]:
+# In[130]:
 
 
 state_trend(df, 'NY', plot= 'pos_rate')
 
 
-# In[19]:
+# In[134]:
 
 
-state_trend(df, 'NJ', plot= 'pos_rate')
+state_trend(df, 'RI', plot= 'pos_rate')
 
 
-# In[71]:
+# In[132]:
 
 
 latest_by_state(df)
