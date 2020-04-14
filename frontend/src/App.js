@@ -64,7 +64,7 @@ class App extends React.Component {
         <div class='dialog-box'>
           <h2 class='dialog-box__name'>Ronny</h2>
           <p>Click on the <b>legend items</b> to show or hide all points.</p>
-          <p>Hover over the points to see tooltips.
+          <p>Hover over the points to see tooltips, or if you are on mobile, touch the points
           </p>
         </div>
 

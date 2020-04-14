@@ -67,7 +67,6 @@ class CumulChart extends React.Component {
           }
         },
         tooltips: {
-          intersect: false,
           callbacks: {
             label: function (tooltipItem, data) {
               let label = 'Test Positive Rate: '
@@ -177,7 +176,6 @@ class DailyChart extends React.Component {
         },
         maintainAspectRatio: false,
         tooltips: {
-          intersect: false,
           mode: 'index',
           callbacks: {
             label: function (tooltipItem, data) {
@@ -487,10 +485,10 @@ class StackedChart extends React.Component {
   componentDidUpdate () {
     this.myChart.data.labels = this.props.dataActive.map(d => d.time)
     this.myChart.data.datasets[2].data = this.props.dataActive.map(d => d.value)
-    this.myChart.data.datasets[0].data = this.props.dataDeath.map(d => d.value)
-    this.myChart.data.datasets[1].data = this.props.dataRecovered.map(d => d.value)
-    this.myChart.data.datasets[0].label = this.props.titleDeath
-    this.myChart.data.datasets[1].label = this.props.titleRecovered
+    this.myChart.data.datasets[1].data = this.props.dataDeath.map(d => d.value)
+    this.myChart.data.datasets[0].data = this.props.dataRecovered.map(d => d.value)
+    this.myChart.data.datasets[1].label = this.props.titleDeath
+    this.myChart.data.datasets[0].label = this.props.titleRecovered
     this.myChart.data.datasets[2].label = this.props.titleActive
     this.myChart.update()
   }
@@ -527,7 +525,6 @@ class StackedChart extends React.Component {
         },
         maintainAspectRatio: false,
         tooltips: {
-          intersect: false,
           mode: 'index',
           callbacks: {
             label: function (tooltipItem, data) {
@@ -540,8 +537,8 @@ class StackedChart extends React.Component {
               return label
             },
             labelColor: function (tooltipItem, data) {
-              return tooltipItem.datasetIndex === 0 ? { backgroundColor: '#E74C3C' }
-                : tooltipItem.datasetIndex === 1 ? { backgroundColor: '#2ECC71' } : { backgroundColor: '#3498DB' }
+              return tooltipItem.datasetIndex === 1 ? { backgroundColor: '#E74C3C' }
+                : tooltipItem.datasetIndex === 0 ? { backgroundColor: '#2ECC71' } : { backgroundColor: '#3498DB' }
             }
           }
         },
@@ -570,17 +567,6 @@ class StackedChart extends React.Component {
         labels: this.props.dataActive.map(d => d.time),
         datasets: [
           {
-            label: this.props.titleDeath,
-            data: this.props.dataDeath.map(d => d.value), // d is array of objects with properties time and value
-            backgroundColor: '#E74C3C',
-            pointRadius: 2,
-            pointBorderWidth: 1,
-            pointBackgroundColor: '#FFFFFF ',
-            pointHoverBackgroundColor: '#E74C3C',
-            borderColor: '#E74C3C',
-            borderWidth: 1
-          },
-          {
             label: this.props.titleRecovered,
             data: this.props.dataRecovered.map(d => d.value), // d is array of objects with properties time and value
             backgroundColor: '#2ECC71',
@@ -589,6 +575,17 @@ class StackedChart extends React.Component {
             pointBackgroundColor: '#FFFFFF ',
             pointHoverBackgroundColor: '#2ECC71',
             borderColor: '#2ECC71',
+            borderWidth: 1
+          },
+          {
+            label: this.props.titleDeath,
+            data: this.props.dataDeath.map(d => d.value), // d is array of objects with properties time and value
+            backgroundColor: '#E74C3C',
+            pointRadius: 2,
+            pointBorderWidth: 1,
+            pointBackgroundColor: '#FFFFFF ',
+            pointHoverBackgroundColor: '#E74C3C',
+            borderColor: '#E74C3C',
             borderWidth: 1
           },
           {
