@@ -131,7 +131,7 @@ class App extends React.Component {
                   <div className='sub chart-wrapper'>
                     <PredDailyChart
                       dataModel={this.state.data[3].data}
-                      dataActual={this.state.data[4].data}
+                      dataActual={this.state.data[1].data}
                       title={this.state.data[3].title}
                       yLabel='Positive Cases'
                       color='#3E517A'
@@ -141,7 +141,7 @@ class App extends React.Component {
                   <div className='sub chart-wrapper'>
                     <PredCumulChart
                       dataModel={this.state.data[5].data}
-                      dataActual={this.state.data[6].data}
+                      dataActual={this.state.data[0].data}
                       title={this.state.data[5].title}
                       color='#3E517A'
                     />
