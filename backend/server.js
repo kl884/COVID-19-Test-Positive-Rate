@@ -52,7 +52,7 @@ const convertToJsonChoro = function (csvName) {
 }
 
 router.get('/data', async (req, res) => {
-  console.log('GET /data: ', req)
+  console.log('GET /data:\n' + `headers: ${req.headers}` + `url: ${req.url}`)
   // const fetchedData = await fetchCsv()
   let dataArray, dataArrayTrend, dataArrayPred
   if (req.query.choropleth === 'true') {
@@ -62,7 +62,7 @@ router.get('/data', async (req, res) => {
     dataArrayPred = await convertToJson(req.query.state, CSV_NAME_PRED)
   }
   const responseBody = {
-    data: dataArray,
+    data: dataArrayTrend,
     dataTrend: dataArrayTrend,
     dataPred: dataArrayPred
   }
