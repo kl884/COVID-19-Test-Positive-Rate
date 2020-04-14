@@ -241,7 +241,7 @@ list= ['United States', 'Northeast Region', 'Midwest Region', 'South Region', 'W
 population['state']= list
 
 
-# In[76]:
+# In[120]:
 
 
 def state_model(df, state, bass_df= False):
@@ -259,7 +259,7 @@ def state_model(df, state, bass_df= False):
     if state == 'NY':
         threshold= 500
     else:
-        threshold= 100
+        threshold= 10
 
     day= 0
     daily_increase= 0
@@ -357,22 +357,22 @@ def state_model(df, state, bass_df= False):
 
 # # User Interface
 
-# In[83]:
+# In[127]:
 
 
-state_model(df, 'NY')
+state_model(df, 'FL')
 
 
 # In[15]:
 
 
-state_trend(df, 'NY', plot= 'pos_rate')
+state_trend(df, 'NY', plot= 'case')
 
 
 # In[16]:
 
 
-state_trend(df, 'NY', plot= 'case')
+state_trend(df, 'NY', plot= 'pos_rate')
 
 
 # In[19]:
