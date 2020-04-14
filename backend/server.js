@@ -7,6 +7,7 @@ const AWS = require('aws-sdk')
 const stream = require('stream')
 const csv = require('csv-parser')
 const fs = require('fs')
+const https = require('https')
 
 const BUCKET_NAME = 'covid-19-trends-stanley'
 const CSV_NAME = 'test.csv'
@@ -95,3 +96,37 @@ app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'))
 })
 http.createServer(app).listen(80, () => console.log('http server ready at 80'))
+
+const httpsApp = express()
+const httpsRouter = express.Router()
+
+httpsRouter.post('/', function (req, res) {
+  console.log('verify line webhook called')
+  res.status(200).send('Verification endpoint status 200')
+})
+httpsRouter.get('/test', async function (req, res) {
+  console.log('test line webhook called')
+  const responseBody = {
+    data: 'cool'
+  }
+  return res.json(responseBody)
+})
+httpsApp.use(bodyParser.urlencoded({
+  extended: true
+}))
+httpsApp.use(bodyParser.json())
+
+httpsApp.use(function (req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Credentials', true)
+  next()
+})
+httpsApp.use('/line', httpsRouter)
+const optionshttps = {
+  key: fs.readFileSync('/home/ubuntu/ssl/private.key', 'utf8'),
+  cert: fs.readFileSync('/home/ubuntu/ssl/certificate.crt', 'utf8'),
+  ca: fs.readFileSync('/home/ubuntu/ssl/ca_bundle.crt', 'utf8')
+}
+https.createServer(optionshttps, httpsApp).listen(443, () => console.log('https server ready at 443!'))
