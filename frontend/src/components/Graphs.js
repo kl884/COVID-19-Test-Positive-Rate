@@ -1,11 +1,13 @@
 import React from 'react'
 import Chart from 'chart.js'
+import _ from 'lodash'
 Chart.defaults.global.defaultFontFamily = 'Roboto, sans-serif'
 
 Chart.defaults.LineWithLine = Chart.defaults.line
 Chart.controllers.LineWithLine = Chart.controllers.line.extend({
   draw: function (ease) {
     Chart.controllers.line.prototype.draw.call(this, ease)
+
     if (this.chart.tooltip._active && this.chart.tooltip._active.length) {
       var activePoint = this.chart.tooltip._active[0]
       var ctx = this.chart.ctx
@@ -646,8 +648,10 @@ class StackedChart extends React.Component {
 
   componentDidUpdate () {
     this.myChart.data.labels = this.props.dataActive.map(d => d.time)
-    this.myChart.data.datasets[2].data = this.props.dataActive.map(d => d.value)
-    this.myChart.data.datasets[1].data = this.props.dataDeath.map(d => d.value)
+    this.myChart.data.datasets[2].data = _.zipWith(this.props.dataDeath, this.props.dataRecovered, this.props.dataActive, (a, b, c) => a.value + b.value + c.value)
+    this.myChart.data.datasets[1].data = _.zipWith(this.props.dataDeath, this.props.dataRecovered, function (a, b) {
+      return a.value + b.value
+    })
     this.myChart.data.datasets[0].data = this.props.dataRecovered.map(d => d.value)
     this.myChart.data.datasets[1].label = this.props.titleDeath
     this.myChart.data.datasets[0].label = this.props.titleRecovered
@@ -703,6 +707,10 @@ class StackedChart extends React.Component {
         tooltips: {
           mode: defaultOptionsForAllGraph.tooltipMode,
           intersect: defaultOptionsForAllGraph.tooltipIntersect,
+          itemSort: function (data1, data2, data) {
+            if (data1.datasetIndex > data2.datasetIndex) return -1
+            return 1
+          },
           callbacks: {
             title: function (tooltipItem, data) {
               const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (Count)'
@@ -713,8 +721,16 @@ class StackedChart extends React.Component {
               if (label) {
                 label += ': '
               }
+              let value
+              if (tooltipItem.datasetIndex === 0) {
+                return label + defaultOptionsForAllGraph.tooltipItemCount(tooltipItem)
+              } else if (tooltipItem.datasetIndex === 1) {
+                value = tooltipItem.yLabel - data.datasets[0].data[tooltipItem.index]
+              } else {
+                value = tooltipItem.yLabel - data.datasets[1].data[tooltipItem.index] - data.datasets[0].data[tooltipItem.index]
+              }
 
-              label += defaultOptionsForAllGraph.tooltipItemCount(tooltipItem)
+              label += value.toLocaleString()
               return label
             },
             labelColor: function (tooltipItem, data) {
@@ -729,8 +745,7 @@ class StackedChart extends React.Component {
           ],
           yAxes: [
             {
-              ticks: defaultOptionsForAllGraph.countTicks({ maxTicksLimit: 8 }),
-              stacked: true
+              ticks: defaultOptionsForAllGraph.countTicks({ maxTicksLimit: 8 })
             }
           ]
         }
@@ -751,7 +766,9 @@ class StackedChart extends React.Component {
           },
           {
             label: this.props.titleDeath,
-            data: this.props.dataDeath.map(d => d.value), // d is array of objects with properties time and value
+            data: _.zipWith(this.props.dataDeath, this.props.dataRecovered, function (a, b) {
+              return a.value + b.value
+            }), // d is array of objects with properties time and value
             backgroundColor: '#E74C3C',
             pointRadius: defaultOptionsForAllGraph.pointRadius,
             pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
@@ -762,7 +779,7 @@ class StackedChart extends React.Component {
           },
           {
             label: this.props.titleActive,
-            data: this.props.dataActive.map(d => d.value), // d is array of objects with properties time and value
+            data: _.zipWith(this.props.dataDeath, this.props.dataRecovered, this.props.dataActive, (a, b, c) => a.value + b.value + c.value), // d is array of objects with properties time and value
             backgroundColor: '#3498DB',
             pointRadius: defaultOptionsForAllGraph.pointRadius,
             pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
