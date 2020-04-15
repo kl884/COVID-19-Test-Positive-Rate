@@ -69,7 +69,7 @@ class CumulChart extends React.Component {
         tooltips: {
           callbacks: {
             title: function (tooltipItem, data) {
-              const title = tooltipItem[0].label.replace(/(?<=2020).*/gi, '')
+              const title = tooltipItem[0].label.replace(/, [0-9]{1,2}:.*m/gi, '')
               return title
             },
             label: function (tooltipItem, data) {
@@ -183,7 +183,7 @@ class DailyChart extends React.Component {
           mode: 'index',
           callbacks: {
             title: function (tooltipItem, data) {
-              const title = tooltipItem[0].label.replace(/(?<=2020).*/gi, '')
+              const title = tooltipItem[0].label.replace(/, [0-9]{1,2}:.*m/gi, '')
               return title
             },
             label: function (tooltipItem, data) {
@@ -195,7 +195,7 @@ class DailyChart extends React.Component {
                 label += Math.round(tooltipItem.yLabel * 100) / 100
                 label += '%'
               } else {
-                label += tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                label += tooltipItem.yLabel.toLocaleString()
               }
               return label
             },
@@ -338,13 +338,13 @@ class PredDailyChart extends React.Component {
           mode: 'index',
           callbacks: {
             title: function (tooltipItem, data) {
-              const title = tooltipItem[0].label.replace(/(?<=2020).*/gi, '')
+              const title = tooltipItem[0].label.replace(/, [0-9]{1,2}:.*m/gi, '')
               return title
             },
             label: function (tooltipItem, data) {
               let label = data.datasets[tooltipItem.datasetIndex].label + ': '
 
-              label += Math.round(tooltipItem.yLabel).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              label += Math.round(tooltipItem.yLabel).toLocaleString()
               return label
             },
             labelColor: function (tooltipItem, data) {
@@ -461,13 +461,13 @@ class PredCumulChart extends React.Component {
           mode: 'index',
           callbacks: {
             title: function (tooltipItem, data) {
-              const title = tooltipItem[0].label.replace(/(?<=2020).*/gi, '')
+              const title = tooltipItem[0].label.replace(/, [0-9]{1,2}:.*m/gi, '')
               return title
             },
             label: function (tooltipItem, data) {
               let label = data.datasets[tooltipItem.datasetIndex].label + ': '
 
-              label += Math.round(tooltipItem.yLabel).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              label += Math.round(tooltipItem.yLabel).toLocaleString()
               return label
             },
             labelColor: function (tooltipItem, data) {
@@ -596,7 +596,7 @@ class StackedChart extends React.Component {
           mode: 'index',
           callbacks: {
             title: function (tooltipItem, data) {
-              const title = tooltipItem[0].label.replace(/(?<=2020).*/gi, '')
+              const title = tooltipItem[0].label.replace(/, [0-9]{1,2}:.*m/gi, ' (Count)')
               return title
             },
             label: function (tooltipItem, data) {
@@ -605,7 +605,7 @@ class StackedChart extends React.Component {
                 label += ': '
               }
 
-              label += tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              label += tooltipItem.yLabel.toLocaleString()
               return label
             },
             labelColor: function (tooltipItem, data) {
