@@ -115,6 +115,19 @@ class CumulChart extends React.Component {
       type: 'LineWithLine',
       options: {
         title: defaultOptionsForAllGraph.title,
+        onClick: function (...args) {
+          const ci = this.chart
+          const meta = ci.getDatasetMeta(0)
+          if (meta.showAllPoint) {
+            ci.data.datasets[0].pointRadius = function (context) {
+              return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
+            }
+          } else {
+            ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+          }
+          meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+          ci.update()
+        },
         legend: {
           display: true,
           labels: {
@@ -218,6 +231,24 @@ class DailyChart extends React.Component {
       type: 'LineWithLine',
       options: {
         title: defaultOptionsForAllGraph.title,
+        onClick: function (...args) {
+          // const datasetIndex = legendItem.datasetIndex
+          const ci = this.chart
+          const meta = ci.getDatasetMeta(0)
+          if (meta.showAllPoint) {
+            ci.data.datasets[0].pointRadius = function (context) {
+              return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
+            }
+            ci.data.datasets[1].pointRadius = function (context) {
+              return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
+            }
+          } else {
+            ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+            ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
+          }
+          meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+          ci.update()
+        },
         legend: {
           display: true,
           labels: {
@@ -365,6 +396,19 @@ class PredDailyChart extends React.Component {
     this.myChart = new Chart(this.canvasRef.current, {
       type: 'LineWithLine',
       options: {
+        onClick: function (...args) {
+          const ci = this.chart
+          const meta = ci.getDatasetMeta(0)
+          if (meta.showAllPoint) {
+            ci.data.datasets[0].pointRadius = 0
+            ci.data.datasets[1].pointRadius = 0
+          } else {
+            ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+            ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
+          }
+          meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+          ci.update()
+        },
         legend: {
           display: true,
           onClick: function (e, legendItem) {
@@ -403,15 +447,6 @@ class PredDailyChart extends React.Component {
             }
           }
         },
-        // plugins: {
-        //   crosshair: {
-        //     line: {
-        //       color: '#F66', // crosshair line color
-        //       width: 1, // crosshair line width
-        //       dashPattern: [5, 5] // crosshair line dash pattern
-        //     }
-        //   }
-        // },
         scales: {
           xAxes: [
             {
@@ -491,6 +526,19 @@ class PredCumulChart extends React.Component {
     this.myChart = new Chart(this.canvasRef.current, {
       type: 'LineWithLine',
       options: {
+        onClick: function (...args) {
+          const ci = this.chart
+          const meta = ci.getDatasetMeta(0)
+          if (meta.showAllPoint) {
+            ci.data.datasets[0].pointRadius = 0
+            ci.data.datasets[1].pointRadius = 0
+          } else {
+            ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+            ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
+          }
+          meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+          ci.update()
+        },
         legend: {
           display: true,
           onClick: function (e, legendItem) {
@@ -612,6 +660,22 @@ class StackedChart extends React.Component {
       type: 'LineWithLine',
       options: {
         title: defaultOptionsForAllGraph.title,
+        onClick: function (...args) {
+          // const datasetIndex = legendItem.datasetIndex
+          const ci = this.chart
+          const meta = ci.getDatasetMeta(0)
+          if (!meta.showAllPoint) {
+            ci.data.datasets[0].pointRadius = 0
+            ci.data.datasets[1].pointRadius = 0
+            ci.data.datasets[2].pointRadius = 0
+          } else {
+            ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+            ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
+            ci.data.datasets[2].pointRadius = defaultOptionsForAllGraph.pointRadius
+          }
+          meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+          ci.update()
+        },
         legend: {
           display: true,
           labels: {
