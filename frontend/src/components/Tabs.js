@@ -22,7 +22,7 @@ class Tabs extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      activeTab: this.props.children[0].props.label
+      activeTab: this.props.children[1].props.label
     }
     this.changeTab = this.changeTab.bind(this)
   }

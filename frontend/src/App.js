@@ -16,7 +16,7 @@ class App extends React.Component {
     this.state = {
       data: null,
       charts: [],
-      activeTab: 'Tab 2'
+      activeTab: 'Prediction'
     }
   }
 
@@ -61,8 +61,8 @@ class App extends React.Component {
   render () {
     return (
       <div>
-        <div class='dialog-box'>
-          <h2 class='dialog-box__name'>Ronny</h2>
+        <div className='dialog-box'>
+          <h2 className='dialog-box__name'>Tips</h2>
           <p>Click on the <b>legend items</b> to show or hide all points.</p>
           <p>Hover over the points to see tooltips, or if you are on mobile, touch the points
           </p>
@@ -93,6 +93,18 @@ class App extends React.Component {
             <Tabs>
               <Tab label='Data'>
                 <div>
+
+                  {this.state.data &&
+                    <div className='sub chart-wrapper'>
+                      <StackedChart
+                        titleActive={this.state.data[9].title}
+                        titleRecovered={this.state.data[7].title}
+                        titleDeath={this.state.data[8].title}
+                        dataActive={this.state.data[9].data}
+                        dataRecovered={this.state.data[7].data}
+                        dataDeath={this.state.data[8].data}
+                      />
+                    </div>}
                   {this.state.data &&
 
                     <div className='sub chart-wrapper'>
@@ -111,17 +123,6 @@ class App extends React.Component {
                         titleVol={this.state.data[2].title}
                         dataVol={this.state.data[2].data}
                         color='#3E517A'
-                      />
-                    </div>}
-                  {this.state.data &&
-                    <div className='sub chart-wrapper'>
-                      <StackedChart
-                        titleActive={this.state.data[9].title}
-                        titleRecovered={this.state.data[7].title}
-                        titleDeath={this.state.data[8].title}
-                        dataActive={this.state.data[9].data}
-                        dataRecovered={this.state.data[7].data}
-                        dataDeath={this.state.data[8].data}
                       />
                     </div>}
                 </div>
@@ -168,6 +169,26 @@ class App extends React.Component {
               </g>
             </svg>
           </div>
+        </div>
+
+        <div className='dialog-box'>
+          <p>This app is still in development. Suggestions, support, and contributions are available at <a
+            href='https://github.com/eestanleyland/COVID-19-Test-Positive-Rate'
+                                                                                                        >Github
+                                                                                                        </a>
+          </p>
+          <p>
+            Website by <a
+              href='https://www.linkedin.com/in/ronnylin/'
+                       >Ronny Lin
+                       </a>
+          </p>
+          <p>
+            Data analytics by <a
+              href='https://www.linkedin.com/in/kystanleylin/'
+                              >Stanley Lin
+                              </a>
+          </p>
         </div>
       </div>
     )

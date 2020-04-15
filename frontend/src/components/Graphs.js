@@ -68,6 +68,10 @@ class CumulChart extends React.Component {
         },
         tooltips: {
           callbacks: {
+            title: function (tooltipItem, data) {
+              const title = tooltipItem[0].label.replace(/(?<=2020).*/gi, '')
+              return title
+            },
             label: function (tooltipItem, data) {
               let label = 'Test Positive Rate: '
               label += Math.round(tooltipItem.yLabel * 100) / 100
@@ -178,6 +182,10 @@ class DailyChart extends React.Component {
         tooltips: {
           mode: 'index',
           callbacks: {
+            title: function (tooltipItem, data) {
+              const title = tooltipItem[0].label.replace(/(?<=2020).*/gi, '')
+              return title
+            },
             label: function (tooltipItem, data) {
               let label = data.datasets[tooltipItem.datasetIndex].label.replace(/.* state/gi, '')
               if (label) {
@@ -187,7 +195,7 @@ class DailyChart extends React.Component {
                 label += Math.round(tooltipItem.yLabel * 100) / 100
                 label += '%'
               } else {
-                label += tooltipItem.yLabel
+                label += tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
               }
               return label
             },
@@ -298,8 +306,8 @@ class PredDailyChart extends React.Component {
 
   componentDidUpdate () {
     this.myChart.data.labels = this.props.dataModel.map(d => d.time)
-    this.myChart.data.datasets[0].data = this.props.dataModel.map(d => d.value)
-    this.myChart.data.datasets[1].data = this.props.dataActual.map(d => d.value)
+    this.myChart.data.datasets[1].data = this.props.dataModel.map(d => d.value)
+    this.myChart.data.datasets[0].data = this.props.dataActual.map(d => d.value)
     this.myChart.options.title.text = this.props.title
     this.myChart.update()
   }
@@ -309,9 +317,41 @@ class PredDailyChart extends React.Component {
       type: 'line',
       options: {
         legend: {
-          display: true
+          display: true,
+          onClick: function (e, legendItem) {
+            const datasetIndex = legendItem.datasetIndex
+            const ci = this.chart
+            const meta = ci.getDatasetMeta(datasetIndex)
+            if (meta.showAllPoint) {
+              ci.data.datasets[0].pointRadius = 0
+              ci.data.datasets[1].pointRadius = 0
+            } else {
+              ci.data.datasets[0].pointRadius = 2
+              ci.data.datasets[1].pointRadius = 2
+            }
+            meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+            ci.update()
+          }
         },
         maintainAspectRatio: false,
+        tooltips: {
+          mode: 'index',
+          callbacks: {
+            title: function (tooltipItem, data) {
+              const title = tooltipItem[0].label.replace(/(?<=2020).*/gi, '')
+              return title
+            },
+            label: function (tooltipItem, data) {
+              let label = data.datasets[tooltipItem.datasetIndex].label + ': '
+
+              label += Math.round(tooltipItem.yLabel).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              return label
+            },
+            labelColor: function (tooltipItem, data) {
+              return tooltipItem.datasetIndex === 0 ? { backgroundColor: '#F39C12' } : { backgroundColor: '#2E86C1' }
+            }
+          }
+        },
         scales: {
           xAxes: [
             {
@@ -319,60 +359,58 @@ class PredDailyChart extends React.Component {
               time: {
                 unit: 'week',
                 displayFormats: {
-                  week: 'M-D'
+                  week: 'M/D'
                 }
               },
               gridLines: {
-                drawOnChartArea: false
+                drawOnChartArea: false,
+                drawBorder: false
               }
             }
           ],
           yAxes: [
             {
-              type: 'linear',
               ticks: {
-                min: 0
-              },
-              display: true,
-              id: 'y-axis-1'
-            },
-            {
-              type: 'linear',
-              ticks: {
-                min: 0,
-                maxTicksLimit: 5
-              },
-              display: false,
-              gridLines: {
-                drawOnChartArea: false
-              },
-              id: 'y-axis-2'
+                maxTicksLimit: 8,
+                callback: function (value, index, values) {
+                  if (value >= 1000) {
+                    return value / 1000 + 'k'
+                  } else {
+                    return value
+                  }
+                }
+              }
             }
           ]
         }
       },
       data: {
         labels: this.props.dataModel.map(d => d.time),
-        datasets: [{
-          label: 'Daily Model', // Top legend lable
-          yAxisID: 'y-axis-1',
-          data: this.props.dataModel.map(d => d.value), // d is array of objects with properties time and value
-          fill: 'none',
-          backgroundColor: '#2E86C1',
-          pointRadius: 0,
-          borderColor: '#2E86C1',
-          borderWidth: 1
-        },
-        {
-          label: 'Daily Actual', // Top legend lable
-          yAxisID: 'y-axis-2',
-          data: this.props.dataActual.map(d => d.value), // d is array of objects with properties time and value
-          fill: 'none',
-          backgroundColor: '#F39C12',
-          pointRadius: 0,
-          borderColor: '#F39C12',
-          borderWidth: 1
-        }
+        datasets: [
+          {
+            label: 'Daily Actual', // Top legend lable
+            data: this.props.dataActual.map(d => d.value), // d is array of objects with properties time and value
+            fill: 'none',
+            backgroundColor: '#F39C12',
+            pointRadius: 0,
+            borderColor: '#F39C12',
+            pointBorderWidth: 1,
+            pointBackgroundColor: '#FFFFFF ',
+            pointHoverBackgroundColor: '#F39C12',
+            borderWidth: 2
+          },
+          {
+            label: 'Daily Model', // Top legend lable
+            data: this.props.dataModel.map(d => d.value), // d is array of objects with properties time and value
+            fill: 'none',
+            backgroundColor: '#2E86C1',
+            pointRadius: 0,
+            borderColor: '#2E86C1',
+            pointBorderWidth: 1,
+            pointBackgroundColor: '#FFFFFF ',
+            pointHoverBackgroundColor: '#2E86C1',
+            borderWidth: 2
+          }
         ]
       }
     })
@@ -391,8 +429,8 @@ class PredCumulChart extends React.Component {
 
   componentDidUpdate () {
     this.myChart.data.labels = this.props.dataModel.map(d => d.time)
-    this.myChart.data.datasets[0].data = this.props.dataModel.map(d => d.value)
-    this.myChart.data.datasets[1].data = this.props.dataActual.map(d => d.value)
+    this.myChart.data.datasets[1].data = this.props.dataModel.map(d => d.value)
+    this.myChart.data.datasets[0].data = this.props.dataActual.map(d => d.value)
     this.myChart.options.title.text = this.props.title
     this.myChart.update()
   }
@@ -402,9 +440,41 @@ class PredCumulChart extends React.Component {
       type: 'line',
       options: {
         legend: {
-          display: true
+          display: true,
+          onClick: function (e, legendItem) {
+            const datasetIndex = legendItem.datasetIndex
+            const ci = this.chart
+            const meta = ci.getDatasetMeta(datasetIndex)
+            if (meta.showAllPoint) {
+              ci.data.datasets[0].pointRadius = 0
+              ci.data.datasets[1].pointRadius = 0
+            } else {
+              ci.data.datasets[0].pointRadius = 2
+              ci.data.datasets[1].pointRadius = 2
+            }
+            meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+            ci.update()
+          }
         },
         maintainAspectRatio: false,
+        tooltips: {
+          mode: 'index',
+          callbacks: {
+            title: function (tooltipItem, data) {
+              const title = tooltipItem[0].label.replace(/(?<=2020).*/gi, '')
+              return title
+            },
+            label: function (tooltipItem, data) {
+              let label = data.datasets[tooltipItem.datasetIndex].label + ': '
+
+              label += Math.round(tooltipItem.yLabel).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              return label
+            },
+            labelColor: function (tooltipItem, data) {
+              return tooltipItem.datasetIndex === 0 ? { backgroundColor: '#F39C12' } : { backgroundColor: '#2E86C1' }
+            }
+          }
+        },
         scales: {
           xAxes: [
             {
@@ -412,60 +482,58 @@ class PredCumulChart extends React.Component {
               time: {
                 unit: 'week',
                 displayFormats: {
-                  week: 'M-D'
+                  week: 'M/D'
                 }
               },
               gridLines: {
-                drawOnChartArea: false
+                drawOnChartArea: false,
+                drawBorder: false
               }
             }
           ],
           yAxes: [
             {
-              type: 'linear',
               ticks: {
-                min: 0
-              },
-              display: true,
-              id: 'y-axis-1'
-            },
-            {
-              type: 'linear',
-              ticks: {
-                min: 0,
-                maxTicksLimit: 5
-              },
-              display: false,
-              gridLines: {
-                drawOnChartArea: false
-              },
-              id: 'y-axis-2'
+                maxTicksLimit: 8,
+                callback: function (value, index, values) {
+                  if (value >= 1000) {
+                    return value / 1000 + 'k'
+                  } else {
+                    return value
+                  }
+                }
+              }
             }
           ]
         }
       },
       data: {
         labels: this.props.dataModel.map(d => d.time),
-        datasets: [{
-          label: 'Cumulative Model', // Top legend lable
-          yAxisID: 'y-axis-1',
-          data: this.props.dataModel.map(d => d.value), // d is array of objects with properties time and value
-          fill: 'none',
-          backgroundColor: '#2E86C1',
-          pointRadius: 0,
-          borderColor: '#2E86C1',
-          borderWidth: 1
-        },
-        {
-          label: 'Cumulative Actual', // Top legend lable
-          yAxisID: 'y-axis-2',
-          data: this.props.dataActual.map(d => d.value), // d is array of objects with properties time and value
-          fill: 'none',
-          backgroundColor: '#F39C12',
-          pointRadius: 0,
-          borderColor: '#F39C12',
-          borderWidth: 1
-        }
+        datasets: [
+          {
+            label: 'Cumulative Actual', // Top legend lable
+            data: this.props.dataActual.map(d => d.value), // d is array of objects with properties time and value
+            fill: 'none',
+            backgroundColor: '#F39C12',
+            pointRadius: 0,
+            borderColor: '#F39C12',
+            pointBorderWidth: 1,
+            pointBackgroundColor: '#FFFFFF ',
+            pointHoverBackgroundColor: '#F39C12',
+            borderWidth: 2
+          },
+          {
+            label: 'Cumulative Model', // Top legend lable
+            data: this.props.dataModel.map(d => d.value), // d is array of objects with properties time and value
+            fill: 'none',
+            backgroundColor: '#2E86C1',
+            pointRadius: 0,
+            borderColor: '#2E86C1',
+            pointBorderWidth: 1,
+            pointBackgroundColor: '#FFFFFF ',
+            pointHoverBackgroundColor: '#2E86C1',
+            borderWidth: 2
+          }
         ]
       }
     })
@@ -527,13 +595,17 @@ class StackedChart extends React.Component {
         tooltips: {
           mode: 'index',
           callbacks: {
+            title: function (tooltipItem, data) {
+              const title = tooltipItem[0].label.replace(/(?<=2020).*/gi, '')
+              return title
+            },
             label: function (tooltipItem, data) {
               let label = data.datasets[tooltipItem.datasetIndex].label.replace(/.* state/gi, '')
               if (label) {
                 label += ': '
               }
 
-              label += tooltipItem.yLabel
+              label += tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
               return label
             },
             labelColor: function (tooltipItem, data) {
@@ -549,7 +621,7 @@ class StackedChart extends React.Component {
           yAxes: [
             {
               ticks: {
-                maxTicksLimit: 5,
+                maxTicksLimit: 8,
                 callback: function (value, index, values) {
                   if (value >= 1000) {
                     return value / 1000 + 'k'
