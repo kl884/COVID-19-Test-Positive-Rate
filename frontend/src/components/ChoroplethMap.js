@@ -19,7 +19,6 @@ class ChoroplethMap extends React.Component {
     // We need to colorize every country based on "numberOfWhatever"
     // colors should be uniq for every value.
     // For this purpose we create palette(using min/max this.props.data-value)
-    console.log(this.state.data)
     const onlyValues = this.state.data.map((row) => row[1])
     const minValue = Math.min.apply(null, onlyValues)
     const maxValue = Math.max.apply(null, onlyValues)
