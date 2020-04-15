@@ -217,6 +217,8 @@ class DailyChart extends React.Component {
               return title
             },
             label: function (tooltipItem, data) {
+              console.log(tooltipItem)
+
               let label = defaultOptionsForAllGraph.tooltipItemLabel(tooltipItem, data)
 
               if (tooltipItem.datasetIndex === 0) {
@@ -348,7 +350,8 @@ class PredDailyChart extends React.Component {
         },
         maintainAspectRatio: false,
         tooltips: {
-          mode: 'index',
+          mode: 'x',
+          intersect: false,
           callbacks: {
             title: function (tooltipItem, data) {
               const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (Count)'
