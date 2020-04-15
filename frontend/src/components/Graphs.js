@@ -52,7 +52,7 @@ const defaultSetting = (context) => {
 
 const defaultOptionsForAllGraph = {
   title: { display: false },
-  pointRadius: 3,
+  pointRadius: 2,
   legendDisplay: true,
   tooltipItemTitle: (tooltipItem) => {
     return tooltipItem[0].label.replace(/, [0-9]{1,2}:.*m/gi, '')
@@ -90,7 +90,7 @@ const defaultOptionsForAllGraph = {
     mode: 'index'
   },
   tooltipMode: 'index',
-  pointBorderWidth: 1.5,
+  pointBorderWidth: 1,
   borderWidth: 2,
   pointBackgroundColor: '#FFFFFF ',
   borderDash: [5, 5],
@@ -669,13 +669,13 @@ class StackedChart extends React.Component {
           const ci = this.chart
           const meta = ci.getDatasetMeta(0)
           if (!meta.showAllPoint) {
-            ci.data.datasets[0].pointRadius = 0
-            ci.data.datasets[1].pointRadius = 0
-            ci.data.datasets[2].pointRadius = 0
-          } else {
             ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
             ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
             ci.data.datasets[2].pointRadius = defaultOptionsForAllGraph.pointRadius
+          } else {
+            ci.data.datasets[0].pointRadius = 0
+            ci.data.datasets[1].pointRadius = 0
+            ci.data.datasets[2].pointRadius = 0
           }
           meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
           ci.update()
@@ -690,13 +690,13 @@ class StackedChart extends React.Component {
             const ci = this.chart
             const meta = ci.getDatasetMeta(0)
             if (!meta.showAllPoint) {
-              ci.data.datasets[0].pointRadius = 0
-              ci.data.datasets[1].pointRadius = 0
-              ci.data.datasets[2].pointRadius = 0
-            } else {
               ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
               ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
               ci.data.datasets[2].pointRadius = defaultOptionsForAllGraph.pointRadius
+            } else {
+              ci.data.datasets[0].pointRadius = 0
+              ci.data.datasets[1].pointRadius = 0
+              ci.data.datasets[2].pointRadius = 0
             }
             meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
             ci.update()
@@ -727,7 +727,7 @@ class StackedChart extends React.Component {
               } else if (tooltipItem.datasetIndex === 1) {
                 value = tooltipItem.yLabel - data.datasets[0].data[tooltipItem.index]
               } else {
-                value = tooltipItem.yLabel - data.datasets[1].data[tooltipItem.index] - data.datasets[0].data[tooltipItem.index]
+                value = tooltipItem.yLabel - data.datasets[1].data[tooltipItem.index]
               }
 
               label += value.toLocaleString()
@@ -757,7 +757,7 @@ class StackedChart extends React.Component {
             label: this.props.titleRecovered,
             data: this.props.dataRecovered.map(d => d.value), // d is array of objects with properties time and value
             backgroundColor: '#2ECC71',
-            pointRadius: defaultOptionsForAllGraph.pointRadius,
+            pointRadius: 0,
             pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
             pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
             pointHoverBackgroundColor: '#2ECC71',
@@ -770,7 +770,7 @@ class StackedChart extends React.Component {
               return a.value + b.value
             }), // d is array of objects with properties time and value
             backgroundColor: '#E74C3C',
-            pointRadius: defaultOptionsForAllGraph.pointRadius,
+            pointRadius: 0,
             pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
             pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
             pointHoverBackgroundColor: '#E74C3C',
@@ -781,7 +781,7 @@ class StackedChart extends React.Component {
             label: this.props.titleActive,
             data: _.zipWith(this.props.dataDeath, this.props.dataRecovered, this.props.dataActive, (a, b, c) => a.value + b.value + c.value), // d is array of objects with properties time and value
             backgroundColor: '#3498DB',
-            pointRadius: defaultOptionsForAllGraph.pointRadius,
+            pointRadius: 0,
             pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
             pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
             pointHoverBackgroundColor: '#3498DB',
