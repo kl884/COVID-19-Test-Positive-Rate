@@ -37,7 +37,7 @@ class ChoroplethMap extends React.Component {
       dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value), active: item[2] }
     })
 
-    const map = new Datamap({
+    var map = new Datamap({
       element: document.getElementById('cloropleth_map'),
       scope: 'usa',
       responsive: true,
@@ -52,11 +52,11 @@ class ChoroplethMap extends React.Component {
           // don't show tooltip if country don't present in dataset
           if (!data) { return }
           // tooltip content
-          return ['<div class="hoverinfo">',
-            '<strong>', geo.properties.name, '</strong>',
-            '<br>Positive Rate: <strong>', data.numberOfThings.toFixed(1), '%</strong>',
-            '<br>Active cases: <strong>', data.active, '%</strong>',
-            '</div>'].join('')
+          return '<div class="hoverinfo">' +
+            '<strong>' + geo.properties.name + '</strong>' +
+            '<br>active cases: <strong>' + data.active.slice(0, -2) + '</strong>' +
+            '<br>test positive rate: <strong>' + data.numberOfThings.toFixed(1) + '%</strong>' +
+            '</div>'
         }
       },
       fills: {
@@ -76,6 +76,9 @@ class ChoroplethMap extends React.Component {
     //     var path = d3.geo.path().projection(projection)
     //     return { path: path, projection: projection }
     //   }
+    })
+    window.addEventListener('resize', function () {
+      map.resize()
     })
   }
 
