@@ -3,28 +3,19 @@ const bodyParser = require('body-parser')
 const app = express()
 const path = require('path')
 const http = require('http')
-const AWS = require('aws-sdk')
-const stream = require('stream')
 const csv = require('csv-parser')
 const fs = require('fs')
 const https = require('https')
 
-const BUCKET_NAME = 'covid-19-trends-stanley'
-const CSV_NAME = 'test.csv'
-const options = {
-  apiVersions: {
-    s3: '2006-03-01',
-    sts: '2011-06-15'
-    // other service API versions
-  }
-}
+const CSV_NAME_TREND = 'data.csv'
+const CSV_NAME_PRED = 'predData.csv'
 
 const router = express.Router()
 
-const convertToJson = function (state) {
+const convertToJson = function (state, csvName) {
   return new Promise((resolve, reject) => {
     const results = []
-    fs.createReadStream('data.csv')
+    fs.createReadStream(csvName)
       .pipe(csv())
       .on('data', (data) => {
         if (data.state !== state) return
@@ -41,17 +32,17 @@ const convertToJson = function (state) {
   })
 }
 
-const convertToJsonChoro = function (data) {
+const convertToJsonChoro = function (csvName) {
   return new Promise((resolve, reject) => {
     const result = []
     const numDataNeeded = 56
     let dataSoFar = 0
-    const readStream = fs.createReadStream('data.csv')
+    const readStream = fs.createReadStream(csvName)
     readStream
       .pipe(csv())
       .on('data', (data) => {
         if (dataSoFar === numDataNeeded) return
-        result.push([data.state, parseFloat(data.total_pos_rate)])
+        result.push([data.state, parseFloat(data.total_pos_rate), data.active])
         dataSoFar++
       })
       .on('end', () => {
@@ -61,16 +52,19 @@ const convertToJsonChoro = function (data) {
 }
 
 router.get('/data', async (req, res) => {
-  console.log('fetching data request')
+  console.log('GET /data:\n' + `\theaders: ${JSON.stringify(req.headers)}\n` + `\turl: ${req.url}`)
   // const fetchedData = await fetchCsv()
-  let dataArray = null
+  let dataArray, dataArrayTrend, dataArrayPred
   if (req.query.choropleth === 'true') {
-    dataArray = await convertToJsonChoro()
+    dataArrayTrend = await convertToJsonChoro(CSV_NAME_TREND)
   } else {
-    dataArray = await convertToJson(req.query.state)
+    dataArrayTrend = await convertToJson(req.query.state, CSV_NAME_TREND)
+    dataArrayPred = await convertToJson(req.query.state, CSV_NAME_PRED)
   }
   const responseBody = {
-    data: dataArray
+    data: dataArrayTrend,
+    dataTrend: dataArrayTrend,
+    dataPred: dataArrayPred
   }
   return res.json(responseBody)
 })
