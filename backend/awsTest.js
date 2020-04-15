@@ -36,6 +36,27 @@ const fetchCsv = function (data) {
   return s3.getObject({ Bucket: BUCKET_NAME, Key: 'test.csv' }).promise()
 }
 
+const convertToJsonPred = function (data) {
+  return new Promise((resolve, reject) => {
+    const state = 'NY'
+    const results = []
+    fs.createReadStream('../python/predData.csv')
+      .pipe(csv())
+      .on('data', (data) => {
+        if (data.state !== state) return
+        const keys = Object.keys(data)
+        keys.shift()
+        for (const key of keys) {
+          data[key] = parseFloat(data[key])
+        }
+        results.push(data)
+      })
+      .on('end', () => {
+        resolve(results)
+      })
+  })
+}
+
 const convertToJson = function (data) {
   return new Promise((resolve, reject) => {
     const state = 'NY'
@@ -128,7 +149,7 @@ const convertToJsonFileChoroTwo = function (data) {
 //     console.log('error: ', error)
 //   })
 
-convertToJsonFile()
+convertToJsonPred()
   .then((result) => {
     console.log(result)
   })

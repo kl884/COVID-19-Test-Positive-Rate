@@ -43,7 +43,7 @@ async function getData (state) {
   const data = []
   const fetchedData = await fetchData(state)
   data.push({
-    title: `${state} State Test Positive Rate (%)`,
+    title: `${state} State Test Positive Rate`,
     data: fetchedData.data.map((row) => {
       return {
         time: row.date,
@@ -53,7 +53,7 @@ async function getData (state) {
   })
 
   data.push({
-    title: `${state} State Daily Test Positive Rate (%)`,
+    title: `${state} State Daily Test Positive Rate`,
     data: fetchedData.data.map((row) => {
       return {
         time: row.date,
@@ -63,7 +63,7 @@ async function getData (state) {
   })
 
   data.push({
-    title: `${state} State Daily Test Volume (Count)`,
+    title: `${state} State Daily Test Volume`,
     data: fetchedData.data.map((row) => {
       return {
         time: row.date,
@@ -74,23 +74,43 @@ async function getData (state) {
 
   data.push({
     title: `${state} State Daily New Cases Prediction`,
-    data: getRandomDateArray(40, 0, 30000)
+    data: fetchedData.dataPred.map((row) => {
+      return {
+        time: row.date,
+        value: row.positiveIncrease_pdf
+      }
+    })
   })
   data.push({
     title: 'DailyNewCaseActual',
-    data: getRandomDateArray(20, 0, 30000)
+    data: fetchedData.dataPred.map((row) => {
+      return {
+        time: row.date,
+        value: row.positiveIncrease
+      }
+    })
   })
   data.push({
     title: `${state} State COVID-19 Cumulative Cases Prediction`,
-    data: getRandomDateArray(40, 0, 30000)
+    data: fetchedData.dataPred.map((row) => {
+      return {
+        time: row.date,
+        value: row.positive_cdf
+      }
+    })
   })
   data.push({
     title: 'CumulCaseActual',
-    data: getRandomDateArray(20, 0, 30000)
+    data: fetchedData.dataPred.map((row) => {
+      return {
+        time: row.date,
+        value: row.positive
+      }
+    })
   })
 
   data.push({
-    title: `${state} State Recovered (Count)`,
+    title: `${state} State Recovered`,
     data: fetchedData.data.map((row) => {
       return {
         time: row.date,
@@ -100,7 +120,7 @@ async function getData (state) {
   })
 
   data.push({
-    title: `${state} State Death (Count)`,
+    title: `${state} State Death`,
     data: fetchedData.data.map((row) => {
       return {
         time: row.date,
@@ -110,7 +130,7 @@ async function getData (state) {
   })
 
   data.push({
-    title: `${state} State Active (Count)`,
+    title: `${state} State Active`,
     data: fetchedData.data.map((row) => {
       return {
         time: row.date,

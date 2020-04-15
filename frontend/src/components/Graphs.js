@@ -2,6 +2,31 @@ import React from 'react'
 import Chart from 'chart.js'
 Chart.defaults.global.defaultFontFamily = 'Roboto, sans-serif'
 
+Chart.defaults.LineWithLine = Chart.defaults.line
+Chart.controllers.LineWithLine = Chart.controllers.line.extend({
+  draw: function (ease) {
+    Chart.controllers.line.prototype.draw.call(this, ease)
+    if (this.chart.tooltip._active && this.chart.tooltip._active.length) {
+      var activePoint = this.chart.tooltip._active[0]
+      var ctx = this.chart.ctx
+      var x = activePoint.tooltipPosition().x
+      const Y = this.chart.scales['y-axis-0'] || this.chart.scales['y-axis-1']
+      var topY = Y.top
+      var bottomY = Y.bottom
+
+      // draw line
+      ctx.lineWidth = 1
+      ctx.strokeStyle = '#E5E7E9'
+      ctx.save()
+      ctx.beginPath()
+      ctx.moveTo(x, topY)
+      ctx.lineTo(x, bottomY)
+      ctx.stroke()
+      ctx.restore()
+    }
+  }
+})
+
 const defaultSetting = (context) => {
   // console.log('context: ', context)
   return {
@@ -23,6 +48,53 @@ const defaultSetting = (context) => {
   }
 }
 
+const defaultOptionsForAllGraph = {
+  title: { display: false },
+  pointRadius: 3,
+  legendDisplay: true,
+  tooltipItemTitle: (tooltipItem) => {
+    return tooltipItem[0].label.replace(/, [0-9]{1,2}:.*m/gi, '')
+  },
+  tooltipItemPercentage: (tooltipItem) => {
+    return Math.round(tooltipItem.yLabel * 100) / 100
+  },
+  tooltipItemLabel: (tooltipItem, data) => {
+    return data.datasets[tooltipItem.datasetIndex].label.replace(/.* state/gi, '')
+  },
+  tooltipItemCount: (tooltipItem) => {
+    return Math.round(tooltipItem.yLabel).toLocaleString()
+  },
+  percentTicks: {
+    min: 0,
+    stepSize: 20,
+    max: 100
+  },
+  countTicks: (context) => {
+    return {
+      min: 0,
+      fontColor: context.fontColor || null,
+      maxTicksLimit: context.maxTicksLimit || 5,
+      callback: function (value, index, values) {
+        if (value >= 1000) {
+          return value / 1000 + 'k'
+        } else {
+          return value
+        }
+      }
+    }
+  },
+  hover: {
+    intersect: false,
+    mode: 'index'
+  },
+  tooltipMode: 'index',
+  pointBorderWidth: 1.5,
+  borderWidth: 2,
+  pointBackgroundColor: '#FFFFFF ',
+  borderDash: [5, 5],
+  tooltipIntersect: false
+}
+
 class CumulChart extends React.Component {
   constructor (props) {
     super(props)
@@ -40,11 +112,21 @@ class CumulChart extends React.Component {
 
   componentDidMount () {
     this.myChart = new Chart(this.canvasRef.current, {
-      type: 'line',
+      type: 'LineWithLine',
       options: {
-        title: {
-          display: false,
-          text: this.props.title
+        title: defaultOptionsForAllGraph.title,
+        onClick: function (...args) {
+          const ci = this.chart
+          const meta = ci.getDatasetMeta(0)
+          if (meta.showAllPoint) {
+            ci.data.datasets[0].pointRadius = function (context) {
+              return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
+            }
+          } else {
+            ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+          }
+          meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+          ci.update()
         },
         legend: {
           display: true,
@@ -57,21 +139,27 @@ class CumulChart extends React.Component {
             const meta = ci.getDatasetMeta(datasetIndex)
             if (meta.showAllPoint) {
               ci.data.datasets[datasetIndex].pointRadius = function (context) {
-                return context.dataIndex < 3 ? 2 : 0
+                return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
               }
             } else {
-              ci.data.datasets[datasetIndex].pointRadius = 2
+              ci.data.datasets[datasetIndex].pointRadius = defaultOptionsForAllGraph.pointRadius
             }
             meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
             ci.update()
           }
         },
+        hover: defaultOptionsForAllGraph.hover,
         tooltips: {
+          mode: defaultOptionsForAllGraph.tooltipMode,
+          intersect: defaultOptionsForAllGraph.tooltipIntersect,
           callbacks: {
+            title: function (tooltipItem, data) {
+              const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (%)'
+              return title
+            },
             label: function (tooltipItem, data) {
               let label = 'Test Positive Rate: '
-              label += Math.round(tooltipItem.yLabel * 100) / 100
-              label += '%'
+              label += defaultOptionsForAllGraph.tooltipItemPercentage(tooltipItem)
               return label
             },
             labelColor: function (tooltipItem, data) {
@@ -88,11 +176,7 @@ class CumulChart extends React.Component {
           ],
           yAxes: [
             {
-              ticks: {
-                min: 0,
-                stepSize: 20,
-                max: 100
-              },
+              ticks: defaultOptionsForAllGraph.percentTicks,
               display: true,
               scaleLabel: {
                 display: false,
@@ -110,13 +194,13 @@ class CumulChart extends React.Component {
           fill: 'none',
           backgroundColor: this.props.color,
           pointRadius: function (context) {
-            return context.dataIndex < 3 ? 2 : 0
+            return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
           },
-          pointBorderWidth: 1,
-          pointBackgroundColor: '#FFFFFF ',
+          pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
+          pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
           pointHoverBackgroundColor: this.props.color,
           borderColor: this.props.color,
-          borderWidth: 1
+          borderWidth: defaultOptionsForAllGraph.borderWidth
         }]
       }
     })
@@ -144,11 +228,26 @@ class DailyChart extends React.Component {
 
   componentDidMount () {
     this.myChart = new Chart(this.canvasRef.current, {
-      type: 'line',
+      type: 'LineWithLine',
       options: {
-        title: {
-          display: false,
-          text: ''
+        title: defaultOptionsForAllGraph.title,
+        onClick: function (...args) {
+          // const datasetIndex = legendItem.datasetIndex
+          const ci = this.chart
+          const meta = ci.getDatasetMeta(0)
+          if (meta.showAllPoint) {
+            ci.data.datasets[0].pointRadius = function (context) {
+              return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
+            }
+            ci.data.datasets[1].pointRadius = function (context) {
+              return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
+            }
+          } else {
+            ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+            ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
+          }
+          meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+          ci.update()
         },
         legend: {
           display: true,
@@ -161,33 +260,38 @@ class DailyChart extends React.Component {
             const meta = ci.getDatasetMeta(0)
             if (meta.showAllPoint) {
               ci.data.datasets[0].pointRadius = function (context) {
-                return context.dataIndex < 3 ? 2 : 0
+                return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
               }
               ci.data.datasets[1].pointRadius = function (context) {
-                return context.dataIndex < 3 ? 2 : 0
+                return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
               }
             } else {
-              ci.data.datasets[0].pointRadius = 2
-              ci.data.datasets[1].pointRadius = 2
+              ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+              ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
             }
             meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
             ci.update()
           }
         },
         maintainAspectRatio: false,
+        hover: defaultOptionsForAllGraph.hover,
         tooltips: {
-          mode: 'index',
+          mode: defaultOptionsForAllGraph.tooltipMode,
+          intersect: defaultOptionsForAllGraph.tooltipIntersect,
           callbacks: {
+            title: function (tooltipItem, data) {
+              const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem)
+              return title
+            },
             label: function (tooltipItem, data) {
-              let label = data.datasets[tooltipItem.datasetIndex].label.replace(/.* state/gi, '')
-              if (label) {
-                label += ': '
-              }
+              let label = defaultOptionsForAllGraph.tooltipItemLabel(tooltipItem, data)
+
               if (tooltipItem.datasetIndex === 0) {
-                label += Math.round(tooltipItem.yLabel * 100) / 100
-                label += '%'
+                label += ' (%): '
+                label += defaultOptionsForAllGraph.tooltipItemPercentage(tooltipItem)
               } else {
-                label += tooltipItem.yLabel
+                label += ' (Count): '
+                label += defaultOptionsForAllGraph.tooltipItemCount(tooltipItem)
               }
               return label
             },
@@ -202,12 +306,7 @@ class DailyChart extends React.Component {
           ],
           yAxes: [
             {
-              ticks: {
-                min: 0,
-                fontColor: '#FF2D00',
-                max: 100,
-                stepSize: 20
-              },
+              ticks: defaultOptionsForAllGraph.percentTicks,
               display: true,
               position: 'left',
               scaleLabel: {
@@ -221,18 +320,7 @@ class DailyChart extends React.Component {
               id: 'y-axis-1'
             },
             {
-              ticks: {
-                min: 0,
-                fontColor: '#1E8449',
-                maxTicksLimit: 5,
-                callback: function (value, index, values) {
-                  if (value >= 1000) {
-                    return value / 1000 + 'k'
-                  } else {
-                    return value
-                  }
-                }
-              },
+              ticks: defaultOptionsForAllGraph.countTicks({ fontColor: '#1E8449' }),
               display: true,
               position: 'right',
               scaleLabel: {
@@ -257,13 +345,13 @@ class DailyChart extends React.Component {
           fill: 'none',
           backgroundColor: '#FF2D00',
           pointRadius: function (context) {
-            return context.dataIndex < 3 ? 2 : 0
+            return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
           },
-          pointBorderWidth: 1,
-          pointBackgroundColor: '#FFFFFF ',
+          pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
+          pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
           pointHoverBackgroundColor: '#FF2D00',
           borderColor: '#FF2D00',
-          borderWidth: 1
+          borderWidth: defaultOptionsForAllGraph.borderWidth
         },
         {
           yAxisID: 'y-axis-2',
@@ -272,13 +360,13 @@ class DailyChart extends React.Component {
           fill: 'none',
           backgroundColor: '#1E8449',
           pointRadius: function (context) {
-            return context.dataIndex < 3 ? 2 : 0
+            return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
           },
-          pointBorderWidth: 1,
-          pointBackgroundColor: '#FFFFFF ',
+          pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
+          pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
           pointHoverBackgroundColor: '#1E8449',
           borderColor: '#1E8449',
-          borderWidth: 1
+          borderWidth: defaultOptionsForAllGraph.borderWidth
         }
         ]
       }
@@ -298,20 +386,67 @@ class PredDailyChart extends React.Component {
 
   componentDidUpdate () {
     this.myChart.data.labels = this.props.dataModel.map(d => d.time)
-    this.myChart.data.datasets[0].data = this.props.dataModel.map(d => d.value)
-    this.myChart.data.datasets[1].data = this.props.dataActual.map(d => d.value)
+    this.myChart.data.datasets[1].data = this.props.dataModel.map(d => d.value)
+    this.myChart.data.datasets[0].data = this.props.dataActual.map(d => d.value)
     this.myChart.options.title.text = this.props.title
     this.myChart.update()
   }
 
   componentDidMount () {
     this.myChart = new Chart(this.canvasRef.current, {
-      type: 'line',
+      type: 'LineWithLine',
       options: {
+        onClick: function (...args) {
+          const ci = this.chart
+          const meta = ci.getDatasetMeta(0)
+          if (meta.showAllPoint) {
+            ci.data.datasets[0].pointRadius = 0
+            ci.data.datasets[1].pointRadius = 0
+          } else {
+            ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+            ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
+          }
+          meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+          ci.update()
+        },
         legend: {
-          display: true
+          display: true,
+          onClick: function (e, legendItem) {
+            const datasetIndex = legendItem.datasetIndex
+            const ci = this.chart
+            const meta = ci.getDatasetMeta(datasetIndex)
+            if (meta.showAllPoint) {
+              ci.data.datasets[0].pointRadius = 0
+              ci.data.datasets[1].pointRadius = 0
+            } else {
+              ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+              ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
+            }
+            meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+            ci.update()
+          }
         },
         maintainAspectRatio: false,
+        hover: defaultOptionsForAllGraph.hover,
+        tooltips: {
+          mode: defaultOptionsForAllGraph.tooltipMode,
+          intersect: defaultOptionsForAllGraph.tooltipIntersect,
+          callbacks: {
+            title: function (tooltipItem, data) {
+              const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (Count)'
+              return title
+            },
+            label: function (tooltipItem, data) {
+              let label = data.datasets[tooltipItem.datasetIndex].label + ': '
+
+              label += defaultOptionsForAllGraph.tooltipItemCount(tooltipItem)
+              return label
+            },
+            labelColor: function (tooltipItem, data) {
+              return tooltipItem.datasetIndex === 0 ? { backgroundColor: '#F39C12' } : { backgroundColor: '#2E86C1' }
+            }
+          }
+        },
         scales: {
           xAxes: [
             {
@@ -319,60 +454,50 @@ class PredDailyChart extends React.Component {
               time: {
                 unit: 'week',
                 displayFormats: {
-                  week: 'M-D'
+                  week: 'M/D'
                 }
               },
               gridLines: {
-                drawOnChartArea: false
+                drawOnChartArea: false,
+                drawBorder: false
               }
             }
           ],
           yAxes: [
             {
-              type: 'linear',
-              ticks: {
-                min: 0
-              },
-              display: true,
-              id: 'y-axis-1'
-            },
-            {
-              type: 'linear',
-              ticks: {
-                min: 0,
-                maxTicksLimit: 5
-              },
-              display: false,
-              gridLines: {
-                drawOnChartArea: false
-              },
-              id: 'y-axis-2'
+              ticks: defaultOptionsForAllGraph.countTicks({ maxTicksLimit: 8 })
             }
           ]
         }
       },
       data: {
         labels: this.props.dataModel.map(d => d.time),
-        datasets: [{
-          label: 'Daily Model', // Top legend lable
-          yAxisID: 'y-axis-1',
-          data: this.props.dataModel.map(d => d.value), // d is array of objects with properties time and value
-          fill: 'none',
-          backgroundColor: '#2E86C1',
-          pointRadius: 0,
-          borderColor: '#2E86C1',
-          borderWidth: 1
-        },
-        {
-          label: 'Daily Actual', // Top legend lable
-          yAxisID: 'y-axis-2',
-          data: this.props.dataActual.map(d => d.value), // d is array of objects with properties time and value
-          fill: 'none',
-          backgroundColor: '#F39C12',
-          pointRadius: 0,
-          borderColor: '#F39C12',
-          borderWidth: 1
-        }
+        datasets: [
+          {
+            label: 'Daily Actual', // Top legend lable
+            data: this.props.dataActual.map(d => d.value), // d is array of objects with properties time and value
+            fill: 'none',
+            backgroundColor: '#F39C12',
+            pointRadius: 0,
+            borderColor: '#F39C12',
+            pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
+            pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
+            pointHoverBackgroundColor: '#F39C12',
+            borderWidth: defaultOptionsForAllGraph.borderWidth
+          },
+          {
+            label: 'Daily Model', // Top legend lable
+            data: this.props.dataModel.map(d => d.value), // d is array of objects with properties time and value
+            fill: 'none',
+            backgroundColor: '#2E86C1',
+            borderDash: defaultOptionsForAllGraph.borderDash,
+            pointRadius: 0,
+            borderColor: '#2E86C1',
+            pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
+            pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
+            pointHoverBackgroundColor: '#2E86C1',
+            borderWidth: defaultOptionsForAllGraph.borderWidth
+          }
         ]
       }
     })
@@ -391,20 +516,67 @@ class PredCumulChart extends React.Component {
 
   componentDidUpdate () {
     this.myChart.data.labels = this.props.dataModel.map(d => d.time)
-    this.myChart.data.datasets[0].data = this.props.dataModel.map(d => d.value)
-    this.myChart.data.datasets[1].data = this.props.dataActual.map(d => d.value)
+    this.myChart.data.datasets[1].data = this.props.dataModel.map(d => d.value)
+    this.myChart.data.datasets[0].data = this.props.dataActual.map(d => d.value)
     this.myChart.options.title.text = this.props.title
     this.myChart.update()
   }
 
   componentDidMount () {
     this.myChart = new Chart(this.canvasRef.current, {
-      type: 'line',
+      type: 'LineWithLine',
       options: {
-        legend: {
-          display: true
+        onClick: function (...args) {
+          const ci = this.chart
+          const meta = ci.getDatasetMeta(0)
+          if (meta.showAllPoint) {
+            ci.data.datasets[0].pointRadius = 0
+            ci.data.datasets[1].pointRadius = 0
+          } else {
+            ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+            ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
+          }
+          meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+          ci.update()
         },
+        legend: {
+          display: true,
+          onClick: function (e, legendItem) {
+            const datasetIndex = legendItem.datasetIndex
+            const ci = this.chart
+            const meta = ci.getDatasetMeta(datasetIndex)
+            if (meta.showAllPoint) {
+              ci.data.datasets[0].pointRadius = 0
+              ci.data.datasets[1].pointRadius = 0
+            } else {
+              ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+              ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
+            }
+            meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+            ci.update()
+          }
+        },
+        hover: defaultOptionsForAllGraph.hover,
         maintainAspectRatio: false,
+        tooltips: {
+          mode: 'index',
+          intersect: defaultOptionsForAllGraph.tooltipIntersect,
+          callbacks: {
+            title: function (tooltipItem, data) {
+              const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (Count)'
+              return title
+            },
+            label: function (tooltipItem, data) {
+              let label = data.datasets[tooltipItem.datasetIndex].label + ': '
+
+              label += defaultOptionsForAllGraph.tooltipItemCount(tooltipItem)
+              return label
+            },
+            labelColor: function (tooltipItem, data) {
+              return tooltipItem.datasetIndex === 0 ? { backgroundColor: '#F39C12' } : { backgroundColor: '#2E86C1' }
+            }
+          }
+        },
         scales: {
           xAxes: [
             {
@@ -412,60 +584,50 @@ class PredCumulChart extends React.Component {
               time: {
                 unit: 'week',
                 displayFormats: {
-                  week: 'M-D'
+                  week: 'M/D'
                 }
               },
               gridLines: {
-                drawOnChartArea: false
+                drawOnChartArea: false,
+                drawBorder: false
               }
             }
           ],
           yAxes: [
             {
-              type: 'linear',
-              ticks: {
-                min: 0
-              },
-              display: true,
-              id: 'y-axis-1'
-            },
-            {
-              type: 'linear',
-              ticks: {
-                min: 0,
-                maxTicksLimit: 5
-              },
-              display: false,
-              gridLines: {
-                drawOnChartArea: false
-              },
-              id: 'y-axis-2'
+              ticks: defaultOptionsForAllGraph.countTicks({ maxTicksLimit: 8 })
             }
           ]
         }
       },
       data: {
         labels: this.props.dataModel.map(d => d.time),
-        datasets: [{
-          label: 'Cumulative Model', // Top legend lable
-          yAxisID: 'y-axis-1',
-          data: this.props.dataModel.map(d => d.value), // d is array of objects with properties time and value
-          fill: 'none',
-          backgroundColor: '#2E86C1',
-          pointRadius: 0,
-          borderColor: '#2E86C1',
-          borderWidth: 1
-        },
-        {
-          label: 'Cumulative Actual', // Top legend lable
-          yAxisID: 'y-axis-2',
-          data: this.props.dataActual.map(d => d.value), // d is array of objects with properties time and value
-          fill: 'none',
-          backgroundColor: '#F39C12',
-          pointRadius: 0,
-          borderColor: '#F39C12',
-          borderWidth: 1
-        }
+        datasets: [
+          {
+            label: 'Cumulative Actual', // Top legend lable
+            data: this.props.dataActual.map(d => d.value), // d is array of objects with properties time and value
+            fill: 'none',
+            backgroundColor: '#F39C12',
+            pointRadius: 0,
+            borderColor: '#F39C12',
+            pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
+            pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
+            pointHoverBackgroundColor: '#F39C12',
+            borderWidth: defaultOptionsForAllGraph.borderWidth
+          },
+          {
+            label: 'Cumulative Model', // Top legend lable
+            data: this.props.dataModel.map(d => d.value), // d is array of objects with properties time and value
+            fill: 'none',
+            backgroundColor: '#2E86C1',
+            borderDash: defaultOptionsForAllGraph.borderDash,
+            pointRadius: 0,
+            borderColor: '#2E86C1',
+            pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
+            pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
+            pointHoverBackgroundColor: '#2E86C1',
+            borderWidth: defaultOptionsForAllGraph.borderWidth
+          }
         ]
       }
     })
@@ -495,11 +657,24 @@ class StackedChart extends React.Component {
 
   componentDidMount () {
     this.myChart = new Chart(this.canvasRef.current, {
-      type: 'line',
+      type: 'LineWithLine',
       options: {
-        title: {
-          display: false,
-          text: ''
+        title: defaultOptionsForAllGraph.title,
+        onClick: function (...args) {
+          // const datasetIndex = legendItem.datasetIndex
+          const ci = this.chart
+          const meta = ci.getDatasetMeta(0)
+          if (!meta.showAllPoint) {
+            ci.data.datasets[0].pointRadius = 0
+            ci.data.datasets[1].pointRadius = 0
+            ci.data.datasets[2].pointRadius = 0
+          } else {
+            ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+            ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
+            ci.data.datasets[2].pointRadius = defaultOptionsForAllGraph.pointRadius
+          }
+          meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
+          ci.update()
         },
         legend: {
           display: true,
@@ -515,25 +690,31 @@ class StackedChart extends React.Component {
               ci.data.datasets[1].pointRadius = 0
               ci.data.datasets[2].pointRadius = 0
             } else {
-              ci.data.datasets[0].pointRadius = 2
-              ci.data.datasets[1].pointRadius = 2
-              ci.data.datasets[2].pointRadius = 2
+              ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
+              ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
+              ci.data.datasets[2].pointRadius = defaultOptionsForAllGraph.pointRadius
             }
             meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
             ci.update()
           }
         },
         maintainAspectRatio: false,
+        hover: defaultOptionsForAllGraph.hover,
         tooltips: {
-          mode: 'index',
+          mode: defaultOptionsForAllGraph.tooltipMode,
+          intersect: defaultOptionsForAllGraph.tooltipIntersect,
           callbacks: {
+            title: function (tooltipItem, data) {
+              const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (Count)'
+              return title
+            },
             label: function (tooltipItem, data) {
-              let label = data.datasets[tooltipItem.datasetIndex].label.replace(/.* state/gi, '')
+              let label = defaultOptionsForAllGraph.tooltipItemLabel(tooltipItem, data)
               if (label) {
                 label += ': '
               }
 
-              label += tooltipItem.yLabel
+              label += defaultOptionsForAllGraph.tooltipItemCount(tooltipItem)
               return label
             },
             labelColor: function (tooltipItem, data) {
@@ -548,16 +729,7 @@ class StackedChart extends React.Component {
           ],
           yAxes: [
             {
-              ticks: {
-                maxTicksLimit: 5,
-                callback: function (value, index, values) {
-                  if (value >= 1000) {
-                    return value / 1000 + 'k'
-                  } else {
-                    return value
-                  }
-                }
-              },
+              ticks: defaultOptionsForAllGraph.countTicks({ maxTicksLimit: 8 }),
               stacked: true
             }
           ]
@@ -570,34 +742,34 @@ class StackedChart extends React.Component {
             label: this.props.titleRecovered,
             data: this.props.dataRecovered.map(d => d.value), // d is array of objects with properties time and value
             backgroundColor: '#2ECC71',
-            pointRadius: 2,
-            pointBorderWidth: 1,
-            pointBackgroundColor: '#FFFFFF ',
+            pointRadius: defaultOptionsForAllGraph.pointRadius,
+            pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
+            pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
             pointHoverBackgroundColor: '#2ECC71',
             borderColor: '#2ECC71',
-            borderWidth: 1
+            borderWidth: defaultOptionsForAllGraph.borderWidth
           },
           {
             label: this.props.titleDeath,
             data: this.props.dataDeath.map(d => d.value), // d is array of objects with properties time and value
             backgroundColor: '#E74C3C',
-            pointRadius: 2,
-            pointBorderWidth: 1,
-            pointBackgroundColor: '#FFFFFF ',
+            pointRadius: defaultOptionsForAllGraph.pointRadius,
+            pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
+            pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
             pointHoverBackgroundColor: '#E74C3C',
             borderColor: '#E74C3C',
-            borderWidth: 1
+            borderWidth: defaultOptionsForAllGraph.borderWidth
           },
           {
             label: this.props.titleActive,
             data: this.props.dataActive.map(d => d.value), // d is array of objects with properties time and value
             backgroundColor: '#3498DB',
-            pointRadius: 2,
-            pointBorderWidth: 1,
-            pointBackgroundColor: '#FFFFFF ',
+            pointRadius: defaultOptionsForAllGraph.pointRadius,
+            pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
+            pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
             pointHoverBackgroundColor: '#3498DB',
             borderColor: '#3498DB',
-            borderWidth: 1
+            borderWidth: defaultOptionsForAllGraph.borderWidth
           }
         ]
       }
