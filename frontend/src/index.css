@@ -67,6 +67,7 @@ code {
 
 .sub.chart-wrapper {
   /* max-width: 700px; */
+  padding-bottom: 50px;
   height: 300px;
 }
 
@@ -89,6 +90,12 @@ code {
 @media (min-width: 800px) {
   .sub.chart-wrapper {
     width: 46%;
+  }
+}
+
+@media (max-width: 800px) {
+  .sub.chart-wrapper {
+    height: 200px;
   }
 }
 
