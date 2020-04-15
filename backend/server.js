@@ -56,7 +56,7 @@ router.get('/data', async (req, res) => {
   // const fetchedData = await fetchCsv()
   let dataArray, dataArrayTrend, dataArrayPred
   if (req.query.choropleth === 'true') {
-    dataArray = await convertToJsonChoro(CSV_NAME_TREND)
+    dataArrayTrend = await convertToJsonChoro(CSV_NAME_TREND)
   } else {
     dataArrayTrend = await convertToJson(req.query.state, CSV_NAME_TREND)
     dataArrayPred = await convertToJson(req.query.state, CSV_NAME_PRED)

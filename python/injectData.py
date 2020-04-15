@@ -111,8 +111,9 @@ def prediction_data(df):
         cofactor= np.exp(-(p+q)*tp)
         df_Y['positiveIncrease_pdf']= m*(((p+q)**2/p)*cofactor)/(1+(q/p)*cofactor)**2
         df_Y['positive_cdf']= m*(1-cofactor)/(1+(q/p)*cofactor)
-        df_Y = df_Y[['date', 'positiveIncrease_pdf', 'positive_cdf']]
+        df_Y = df_Y[['date', 'positive','positiveIncrease','positiveIncrease_pdf', 'positive_cdf']]
         df_Y['state'] = TEST_STATE
+        df_Y['date'] = df_Y['date']*1000
         result_df = result_df.append(df_Y)
     result_df.to_csv(RELATIVE_PATH_CSV_PRED, index=False, header=True)
     return result_df

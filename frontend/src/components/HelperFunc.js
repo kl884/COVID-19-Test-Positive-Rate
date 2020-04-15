@@ -83,7 +83,12 @@ async function getData (state) {
   })
   data.push({
     title: 'DailyNewCaseActual',
-    data: getRandomDateArray(20, 0, 30000)
+    data: fetchedData.dataPred.map((row) => {
+      return {
+        time: row.date,
+        value: row.positiveIncrease
+      }
+    })
   })
   data.push({
     title: `${state} State COVID-19 Cumulative Cases Prediction`,
@@ -96,7 +101,12 @@ async function getData (state) {
   })
   data.push({
     title: 'CumulCaseActual',
-    data: getRandomDateArray(20, 0, 30000)
+    data: fetchedData.dataPred.map((row) => {
+      return {
+        time: row.date,
+        value: row.positive
+      }
+    })
   })
 
   data.push({
