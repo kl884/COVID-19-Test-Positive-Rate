@@ -2,6 +2,31 @@ import React from 'react'
 import Chart from 'chart.js'
 Chart.defaults.global.defaultFontFamily = 'Roboto, sans-serif'
 
+Chart.defaults.LineWithLine = Chart.defaults.line
+Chart.controllers.LineWithLine = Chart.controllers.line.extend({
+  draw: function (ease) {
+    Chart.controllers.line.prototype.draw.call(this, ease)
+    if (this.chart.tooltip._active && this.chart.tooltip._active.length) {
+      var activePoint = this.chart.tooltip._active[0]
+      var ctx = this.chart.ctx
+      var x = activePoint.tooltipPosition().x
+      const Y = this.chart.scales['y-axis-0'] || this.chart.scales['y-axis-1']
+      var topY = Y.top
+      var bottomY = Y.bottom
+
+      // draw line
+      ctx.lineWidth = 1
+      ctx.strokeStyle = '#E5E7E9'
+      ctx.save()
+      ctx.beginPath()
+      ctx.moveTo(x, topY)
+      ctx.lineTo(x, bottomY)
+      ctx.stroke()
+      ctx.restore()
+    }
+  }
+})
+
 const defaultSetting = (context) => {
   // console.log('context: ', context)
   return {
@@ -58,10 +83,16 @@ const defaultOptionsForAllGraph = {
       }
     }
   },
+  hover: {
+    intersect: false,
+    mode: 'index'
+  },
+  tooltipMode: 'index',
   pointBorderWidth: 1.5,
   borderWidth: 2,
   pointBackgroundColor: '#FFFFFF ',
-  borderDash: [5, 5]
+  borderDash: [5, 5],
+  tooltipIntersect: false
 }
 
 class CumulChart extends React.Component {
@@ -81,7 +112,7 @@ class CumulChart extends React.Component {
 
   componentDidMount () {
     this.myChart = new Chart(this.canvasRef.current, {
-      type: 'line',
+      type: 'LineWithLine',
       options: {
         title: defaultOptionsForAllGraph.title,
         legend: {
@@ -104,7 +135,10 @@ class CumulChart extends React.Component {
             ci.update()
           }
         },
+        hover: defaultOptionsForAllGraph.hover,
         tooltips: {
+          mode: defaultOptionsForAllGraph.tooltipMode,
+          intersect: defaultOptionsForAllGraph.tooltipIntersect,
           callbacks: {
             title: function (tooltipItem, data) {
               const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (%)'
@@ -181,7 +215,7 @@ class DailyChart extends React.Component {
 
   componentDidMount () {
     this.myChart = new Chart(this.canvasRef.current, {
-      type: 'line',
+      type: 'LineWithLine',
       options: {
         title: defaultOptionsForAllGraph.title,
         legend: {
@@ -209,16 +243,16 @@ class DailyChart extends React.Component {
           }
         },
         maintainAspectRatio: false,
+        hover: defaultOptionsForAllGraph.hover,
         tooltips: {
-          mode: 'index',
+          mode: defaultOptionsForAllGraph.tooltipMode,
+          intersect: defaultOptionsForAllGraph.tooltipIntersect,
           callbacks: {
             title: function (tooltipItem, data) {
               const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem)
               return title
             },
             label: function (tooltipItem, data) {
-              console.log(tooltipItem)
-
               let label = defaultOptionsForAllGraph.tooltipItemLabel(tooltipItem, data)
 
               if (tooltipItem.datasetIndex === 0) {
@@ -329,7 +363,7 @@ class PredDailyChart extends React.Component {
 
   componentDidMount () {
     this.myChart = new Chart(this.canvasRef.current, {
-      type: 'line',
+      type: 'LineWithLine',
       options: {
         legend: {
           display: true,
@@ -349,9 +383,10 @@ class PredDailyChart extends React.Component {
           }
         },
         maintainAspectRatio: false,
+        hover: defaultOptionsForAllGraph.hover,
         tooltips: {
-          mode: 'x',
-          intersect: false,
+          mode: defaultOptionsForAllGraph.tooltipMode,
+          intersect: defaultOptionsForAllGraph.tooltipIntersect,
           callbacks: {
             title: function (tooltipItem, data) {
               const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (Count)'
@@ -368,6 +403,15 @@ class PredDailyChart extends React.Component {
             }
           }
         },
+        // plugins: {
+        //   crosshair: {
+        //     line: {
+        //       color: '#F66', // crosshair line color
+        //       width: 1, // crosshair line width
+        //       dashPattern: [5, 5] // crosshair line dash pattern
+        //     }
+        //   }
+        // },
         scales: {
           xAxes: [
             {
@@ -445,7 +489,7 @@ class PredCumulChart extends React.Component {
 
   componentDidMount () {
     this.myChart = new Chart(this.canvasRef.current, {
-      type: 'line',
+      type: 'LineWithLine',
       options: {
         legend: {
           display: true,
@@ -464,9 +508,11 @@ class PredCumulChart extends React.Component {
             ci.update()
           }
         },
+        hover: defaultOptionsForAllGraph.hover,
         maintainAspectRatio: false,
         tooltips: {
           mode: 'index',
+          intersect: defaultOptionsForAllGraph.tooltipIntersect,
           callbacks: {
             title: function (tooltipItem, data) {
               const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (Count)'
@@ -563,7 +609,7 @@ class StackedChart extends React.Component {
 
   componentDidMount () {
     this.myChart = new Chart(this.canvasRef.current, {
-      type: 'line',
+      type: 'LineWithLine',
       options: {
         title: defaultOptionsForAllGraph.title,
         legend: {
@@ -589,8 +635,10 @@ class StackedChart extends React.Component {
           }
         },
         maintainAspectRatio: false,
+        hover: defaultOptionsForAllGraph.hover,
         tooltips: {
-          mode: 'index',
+          mode: defaultOptionsForAllGraph.tooltipMode,
+          intersect: defaultOptionsForAllGraph.tooltipIntersect,
           callbacks: {
             title: function (tooltipItem, data) {
               const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (Count)'

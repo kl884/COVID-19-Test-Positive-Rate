@@ -34,7 +34,7 @@ class ChoroplethMap extends React.Component {
       // item example value ["USA", 70]
       const iso = item[0]
       const value = item[1]
-      dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value) }
+      dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value), active: item[2] }
     })
 
     const map = new Datamap({
@@ -54,7 +54,8 @@ class ChoroplethMap extends React.Component {
           // tooltip content
           return ['<div class="hoverinfo">',
             '<strong>', geo.properties.name, '</strong>',
-            '<br>Total Positive Rate: <strong>', data.numberOfThings.toFixed(1), '%</strong>',
+            '<br>Positive Rate: <strong>', data.numberOfThings.toFixed(1), '%</strong>',
+            '<br>Active cases: <strong>', data.active, '%</strong>',
             '</div>'].join('')
         }
       },
