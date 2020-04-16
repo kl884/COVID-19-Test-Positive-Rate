@@ -67,6 +67,7 @@ code {
 
 .sub.chart-wrapper {
   /* max-width: 700px; */
+  padding-bottom: 35px;
   height: 300px;
 }
 
@@ -92,11 +93,11 @@ code {
   }
 }
 
-/* @media (max-width: 800px) {
+@media (max-width: 800px) {
   .sub.chart-wrapper {
-    height: 200px;
+    height: 250px;
   }
-} */
+}
 
 @media (min-width: 1400px) {
   .nook-phone-center {
