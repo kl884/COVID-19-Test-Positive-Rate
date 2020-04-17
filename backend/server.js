@@ -115,19 +115,20 @@ httpsApp.post('/line', (req, res) => {
 })
 
 function getProfileName (event) {
-  if (event.source.type !== 'user') return Promise.resolve(null)
-  client.getProfile(event.source.userId)
-    .then((profile) => {
-      console.log(profile.displayName)
-      console.log(profile.userId)
-      console.log(profile.pictureUrl)
-      console.log(profile.statusMessage)
-      return Promise.resolve(profile.displayName)
-    })
-    .catch((err) => {
-      console.error('Error when getProfile: ', err)
-      return Promise.resolve('Something went wrong when getting user profile')
-    })
+  return new Promise((resolve, reject) => {
+    if (event.source.type !== 'user') return resolve(null)
+    client.getProfile(event.source.userId)
+      .then((profile) => {
+        console.log(profile.displayName)
+        console.log(profile.userId)
+        console.log(profile.pictureUrl)
+        console.log(profile.statusMessage)
+        resolve(profile.displayName)
+      })
+      .catch((err) => {
+        reject(new Error('something went wrong when calling getProfile ', err))
+      })
+  })
 }
 
 function handleEvent (event) {
