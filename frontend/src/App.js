@@ -61,7 +61,6 @@ class App extends React.Component {
       <div>
         <div className='dialog-box'>
           <h2 className='dialog-box__name'>Tips</h2>
-          <p>Click on the <b>legend items</b> to show or hide all points.</p>
           <p>Hover over the points to see tooltips, or if you are on mobile, touch the points
           </p>
         </div>
@@ -170,6 +169,11 @@ class App extends React.Component {
         </div>
 
         <div className='dialog-box'>
+          <p>Data is pulled from  <a
+            href='https://covidtracking.com/'
+          >The COVID Tracking Project
+          </a>
+          </p>
           <p>This app is in constant development. Suggestions, support, and contributions are available through <a
             href='https://github.com/eestanleyland/COVID-19-Test-Positive-Rate'
                                                                                                                 >Github

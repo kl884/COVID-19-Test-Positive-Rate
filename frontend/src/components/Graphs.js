@@ -1,11 +1,16 @@
 import React from 'react'
 import Chart from 'chart.js'
+import _ from 'lodash'
 Chart.defaults.global.defaultFontFamily = 'Roboto, sans-serif'
 
 Chart.defaults.LineWithLine = Chart.defaults.line
 Chart.controllers.LineWithLine = Chart.controllers.line.extend({
   draw: function (ease) {
     Chart.controllers.line.prototype.draw.call(this, ease)
+<<<<<<< HEAD
+=======
+
+>>>>>>> frontend_ui_test
     if (this.chart.tooltip._active && this.chart.tooltip._active.length) {
       var activePoint = this.chart.tooltip._active[0]
       var ctx = this.chart.ctx
@@ -50,7 +55,7 @@ const defaultSetting = (context) => {
 
 const defaultOptionsForAllGraph = {
   title: { display: false },
-  pointRadius: 3,
+  pointRadius: 2,
   legendDisplay: true,
   tooltipItemTitle: (tooltipItem) => {
     return tooltipItem[0].label.replace(/, [0-9]{1,2}:.*m/gi, '')
@@ -88,7 +93,7 @@ const defaultOptionsForAllGraph = {
     mode: 'index'
   },
   tooltipMode: 'index',
-  pointBorderWidth: 1.5,
+  pointBorderWidth: 1,
   borderWidth: 2,
   pointBackgroundColor: '#FFFFFF ',
   borderDash: [5, 5],
@@ -646,8 +651,10 @@ class StackedChart extends React.Component {
 
   componentDidUpdate () {
     this.myChart.data.labels = this.props.dataActive.map(d => d.time)
-    this.myChart.data.datasets[2].data = this.props.dataActive.map(d => d.value)
-    this.myChart.data.datasets[1].data = this.props.dataDeath.map(d => d.value)
+    this.myChart.data.datasets[2].data = _.zipWith(this.props.dataDeath, this.props.dataRecovered, this.props.dataActive, (a, b, c) => a.value + b.value + c.value)
+    this.myChart.data.datasets[1].data = _.zipWith(this.props.dataDeath, this.props.dataRecovered, function (a, b) {
+      return a.value + b.value
+    })
     this.myChart.data.datasets[0].data = this.props.dataRecovered.map(d => d.value)
     this.myChart.data.datasets[1].label = this.props.titleDeath
     this.myChart.data.datasets[0].label = this.props.titleRecovered
@@ -665,13 +672,13 @@ class StackedChart extends React.Component {
           const ci = this.chart
           const meta = ci.getDatasetMeta(0)
           if (!meta.showAllPoint) {
-            ci.data.datasets[0].pointRadius = 0
-            ci.data.datasets[1].pointRadius = 0
-            ci.data.datasets[2].pointRadius = 0
-          } else {
             ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
             ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
             ci.data.datasets[2].pointRadius = defaultOptionsForAllGraph.pointRadius
+          } else {
+            ci.data.datasets[0].pointRadius = 0
+            ci.data.datasets[1].pointRadius = 0
+            ci.data.datasets[2].pointRadius = 0
           }
           meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
           ci.update()
@@ -686,13 +693,13 @@ class StackedChart extends React.Component {
             const ci = this.chart
             const meta = ci.getDatasetMeta(0)
             if (!meta.showAllPoint) {
-              ci.data.datasets[0].pointRadius = 0
-              ci.data.datasets[1].pointRadius = 0
-              ci.data.datasets[2].pointRadius = 0
-            } else {
               ci.data.datasets[0].pointRadius = defaultOptionsForAllGraph.pointRadius
               ci.data.datasets[1].pointRadius = defaultOptionsForAllGraph.pointRadius
               ci.data.datasets[2].pointRadius = defaultOptionsForAllGraph.pointRadius
+            } else {
+              ci.data.datasets[0].pointRadius = 0
+              ci.data.datasets[1].pointRadius = 0
+              ci.data.datasets[2].pointRadius = 0
             }
             meta.showAllPoint = meta.showAllPoint === null || meta.showAllPoint === undefined ? !meta.showAllPoint : null
             ci.update()
@@ -703,6 +710,10 @@ class StackedChart extends React.Component {
         tooltips: {
           mode: defaultOptionsForAllGraph.tooltipMode,
           intersect: defaultOptionsForAllGraph.tooltipIntersect,
+          itemSort: function (data1, data2, data) {
+            if (data1.datasetIndex > data2.datasetIndex) return -1
+            return 1
+          },
           callbacks: {
             title: function (tooltipItem, data) {
               const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (Count)'
@@ -713,8 +724,16 @@ class StackedChart extends React.Component {
               if (label) {
                 label += ': '
               }
+              let value
+              if (tooltipItem.datasetIndex === 0) {
+                return label + defaultOptionsForAllGraph.tooltipItemCount(tooltipItem)
+              } else if (tooltipItem.datasetIndex === 1) {
+                value = tooltipItem.yLabel - data.datasets[0].data[tooltipItem.index]
+              } else {
+                value = tooltipItem.yLabel - data.datasets[1].data[tooltipItem.index]
+              }
 
-              label += defaultOptionsForAllGraph.tooltipItemCount(tooltipItem)
+              label += value.toLocaleString()
               return label
             },
             labelColor: function (tooltipItem, data) {
@@ -729,8 +748,7 @@ class StackedChart extends React.Component {
           ],
           yAxes: [
             {
-              ticks: defaultOptionsForAllGraph.countTicks({ maxTicksLimit: 8 }),
-              stacked: true
+              ticks: defaultOptionsForAllGraph.countTicks({ maxTicksLimit: 8 })
             }
           ]
         }
@@ -742,7 +760,7 @@ class StackedChart extends React.Component {
             label: this.props.titleRecovered,
             data: this.props.dataRecovered.map(d => d.value), // d is array of objects with properties time and value
             backgroundColor: '#2ECC71',
-            pointRadius: defaultOptionsForAllGraph.pointRadius,
+            pointRadius: 0,
             pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
             pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
             pointHoverBackgroundColor: '#2ECC71',
@@ -751,9 +769,11 @@ class StackedChart extends React.Component {
           },
           {
             label: this.props.titleDeath,
-            data: this.props.dataDeath.map(d => d.value), // d is array of objects with properties time and value
+            data: _.zipWith(this.props.dataDeath, this.props.dataRecovered, function (a, b) {
+              return a.value + b.value
+            }), // d is array of objects with properties time and value
             backgroundColor: '#E74C3C',
-            pointRadius: defaultOptionsForAllGraph.pointRadius,
+            pointRadius: 0,
             pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
             pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
             pointHoverBackgroundColor: '#E74C3C',
@@ -762,9 +782,9 @@ class StackedChart extends React.Component {
           },
           {
             label: this.props.titleActive,
-            data: this.props.dataActive.map(d => d.value), // d is array of objects with properties time and value
+            data: _.zipWith(this.props.dataDeath, this.props.dataRecovered, this.props.dataActive, (a, b, c) => a.value + b.value + c.value), // d is array of objects with properties time and value
             backgroundColor: '#3498DB',
-            pointRadius: defaultOptionsForAllGraph.pointRadius,
+            pointRadius: 0,
             pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
             pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
             pointHoverBackgroundColor: '#3498DB',
