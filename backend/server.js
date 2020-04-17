@@ -9,7 +9,7 @@ const https = require('https')
 const line = require('@line/bot-sdk')
 
 const config = {
-  channelAccessToken: process.env.env.CHANNEL_ACCESS_TOKEN,
+  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
   channelSecret: process.env.CHANNEL_SECRET
 }
 console.log(config)
