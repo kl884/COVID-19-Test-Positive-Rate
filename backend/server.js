@@ -13,6 +13,7 @@ const config = {
   channelSecret: process.env.CHANNEL_SECRET
 }
 console.log(config)
+console.log(process.env)
 
 
 const client = new line.Client(config)
