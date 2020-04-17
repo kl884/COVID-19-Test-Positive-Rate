@@ -55,6 +55,8 @@ const defaultOptionsForAllGraph = {
   pointRadius: 2,
   legendDisplay: true,
   tooltipItemTitle: (tooltipItem) => {
+    console.log(tooltipItem)
+    
     return tooltipItem[0].label.replace(/, [0-9]{1,2}:.*m/gi, '')
   },
   tooltipItemPercentage: (tooltipItem) => {

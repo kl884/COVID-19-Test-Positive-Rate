@@ -22,7 +22,7 @@ def slice_latest(df):
     
     return df_latest
 
-def prediction_data(df):
+def prediction_data(df, test=False):
     # If bass_df == True:
     #     Returns a dataframe contains state's actual data and modeled data and varfinal[M,p,q]
     # If bass_df == False (default):
@@ -50,7 +50,8 @@ def prediction_data(df):
     }
     states_df = pd.DataFrame(data_for_model)
     result_df = pd.DataFrame(columns=COLUMNS_FOR_PRED_DATA)
-
+    if test is True:
+        StateOptionList=['AL']
     for state in StateOptionList:
         TEST_STATE=state
         df_state= states_df.loc[states_df['state']==TEST_STATE]
@@ -103,7 +104,7 @@ def prediction_data(df):
         times = pd.date_range(df_Y.at[len(df_Y)-1, 'date'], periods= pred_days, freq= '1D')
         df_times = pd.DataFrame({'date': times[1:]})
         df_Y= df_Y.append(df_times, ignore_index = True, sort= False)
-        df_Y['date'] = pd.DatetimeIndex(df_Y['date']).astype(np.int64) // 10**9
+        df_Y['date'] = pd.DatetimeIndex(df_Y['date']).astype(np.int64) // 10**9 + 20 * 60 * 60 # Add back the truncated time
         df_Y['t']= pd.Series(range(1, len(df_Y['date'])+1))
 
         # model with time interpolation
