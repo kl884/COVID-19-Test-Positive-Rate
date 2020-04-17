@@ -6,6 +6,14 @@ const http = require('http')
 const csv = require('csv-parser')
 const fs = require('fs')
 const https = require('https')
+const line = require('@line/bot-sdk')
+
+const config = {
+  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
+  channelSecret: process.env.CHANNEL_SECRET
+}
+
+const client = new line.Client(config)
 
 const CSV_NAME_TREND = 'data.csv'
 const CSV_NAME_PRED = 'predData.csv'
@@ -93,33 +101,51 @@ app.get('/*', function (req, res) {
 })
 http.createServer(app).listen(80, () => console.log('http server ready at 80'))
 
+// Line Bot
 const httpsApp = express()
-const httpsRouter = express.Router()
+httpsApp.use(line.middleware(config))
+// const httpsRouter = express.Router()
 
-httpsRouter.post('/', function (req, res) {
-  console.log('verify line webhook called')
-  res.status(200).send('Verification endpoint status 200')
+// httpsRouter.post('/', function (req, res) {
+//   console.log('verify line webhook called')
+//   res.status(200).send('Verification endpoint status 200')
+// })
+httpsApp.post('/line', (req, res) => {
+  console.log(req.body)
+  Promise
+    .all(req.body.events.map(handleEvent))
+    .then((result) => res.json(result))
+    .catch((err) => {
+      console.error(err)
+      res.status(500).end()
+    })
 })
-httpsRouter.get('/test', async function (req, res) {
-  console.log('test line webhook called')
-  const responseBody = {
-    data: 'cool'
+
+function handleEvent (event) {
+  console.log(event)
+
+  if (event.type !== 'message' || event.message.type !== 'text') {
+    // ignore non-text-message event
+    return Promise.resolve(null)
   }
-  return res.json(responseBody)
-})
-httpsApp.use(bodyParser.urlencoded({
-  extended: true
-}))
-httpsApp.use(bodyParser.json())
 
-httpsApp.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-  res.setHeader('Access-Control-Allow-Credentials', true)
-  next()
+  // create a echoing text message
+  const echo = { type: 'text', text: event.message.text }
+
+  // use reply API
+  return client.replyMessage(event.replyToken, echo)
+}
+httpsApp.use((err, req, res, next) => {
+  if (err instanceof line.SignatureValidationFailed) {
+    res.status(401).send(err.signature)
+    return
+  } else if (err instanceof line.JSONParseError) {
+    res.status(400).send(err.raw)
+    return
+  }
+  next(err) // will throw default 500
 })
-httpsApp.use('/line', httpsRouter)
+
 const optionshttps = {
   key: fs.readFileSync('/home/ubuntu/ssl/private.key', 'utf8'),
   cert: fs.readFileSync('/home/ubuntu/ssl/certificate.crt', 'utf8'),
