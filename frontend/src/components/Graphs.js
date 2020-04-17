@@ -7,10 +7,6 @@ Chart.defaults.LineWithLine = Chart.defaults.line
 Chart.controllers.LineWithLine = Chart.controllers.line.extend({
   draw: function (ease) {
     Chart.controllers.line.prototype.draw.call(this, ease)
-<<<<<<< HEAD
-=======
-
->>>>>>> frontend_ui_test
     if (this.chart.tooltip._active && this.chart.tooltip._active.length) {
       var activePoint = this.chart.tooltip._active[0]
       var ctx = this.chart.ctx
