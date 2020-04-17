@@ -12,9 +12,6 @@ const config = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
   channelSecret: process.env.CHANNEL_SECRET
 }
-console.log(config)
-console.log(process.env.PYTHON_ENVIRONMENT)
-
 const client = new line.Client(config)
 
 const CSV_NAME_TREND = 'data.csv'
@@ -106,14 +103,8 @@ http.createServer(app).listen(80, () => console.log('http server ready at 80'))
 // Line Bot
 const httpsApp = express()
 httpsApp.use(line.middleware(config))
-// const httpsRouter = express.Router()
 
-// httpsRouter.post('/', function (req, res) {
-//   console.log('verify line webhook called')
-//   res.status(200).send('Verification endpoint status 200')
-// })
 httpsApp.post('/line', (req, res) => {
-  console.log(req.body)
   Promise
     .all(req.body.events.map(handleEvent))
     .then((result) => res.json(result))
@@ -123,19 +114,46 @@ httpsApp.post('/line', (req, res) => {
     })
 })
 
+function getProfileName (event) {
+  if (event.source.type !== 'user') return Promise.resolve(null)
+  client.getProfile(event.source.userId)
+    .then((profile) => {
+      console.log(profile.displayName)
+      console.log(profile.userId)
+      console.log(profile.pictureUrl)
+      console.log(profile.statusMessage)
+      return Promise.resolve(profile.displayName)
+    })
+    .catch((err) => {
+      console.error('Error when getProfile: ', err)
+      return Promise.resolve('Something went wrong when getting user profile')
+    })
+}
+
 function handleEvent (event) {
-  console.log(event)
+  console.log('handle line event: ', event)
 
   if (event.type !== 'message' || event.message.type !== 'text') {
     // ignore non-text-message event
     return Promise.resolve(null)
   }
 
+  getProfileName(event)
+    .then((displayName) => {
+      const echo = { type: 'text', text: `${displayName} 說 ${event.message.text}` }
+      return client.replyMessage(event.replyToken, echo)
+    })
+    .catch((err) => {
+      console.log('Error in getProfile', err)
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: '我在處理訊息時出了問題'
+      })
+    })
+
   // create a echoing text message
-  const echo = { type: 'text', text: event.message.text }
 
   // use reply API
-  return client.replyMessage(event.replyToken, echo)
 }
 httpsApp.use((err, req, res, next) => {
   if (err instanceof line.SignatureValidationFailed) {
