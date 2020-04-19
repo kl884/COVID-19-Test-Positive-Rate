@@ -103,7 +103,6 @@ class App extends React.Component {
                       />
                     </div>}
                   {this.state.data &&
-
                     <div className='sub chart-wrapper'>
                       <CumulChart
                         data={this.state.data[0].data}
@@ -171,25 +170,25 @@ class App extends React.Component {
         <div className='dialog-box'>
           <p>Data is pulled from  <a
             href='https://covidtracking.com/'
-          >The COVID Tracking Project
-          </a>
+                                  >The COVID Tracking Project
+                                  </a>
           </p>
           <p>This app is in constant development. Suggestions, support, and contributions are available through <a
             href='https://github.com/eestanleyland/COVID-19-Test-Positive-Rate'
-                                                                                                                >Github
-          </a>
+          >Github
+                                                                                                                </a>
           </p>
           <p>
             Website by <a
               href='https://www.linkedin.com/in/ronnylin/'
-            >Ronny Lin
-            </a>
+                       >Ronny Lin
+                       </a>
           </p>
           <p>
             Data analytics by <a
               href='https://www.linkedin.com/in/kystanleylin/'
-            >Stanley Lin
-            </a>
+                              >Stanley Lin
+                              </a>
           </p>
         </div>
       </div>

@@ -1,5 +1,11 @@
 import React from 'react'
 
+function BottomLine (props) {
+  return (
+    <div className='buttomLine' />
+  )
+}
+
 const Tab = props => {
   return (
     <>
@@ -10,10 +16,11 @@ const Tab = props => {
 
 const TabButtons = ({ buttons, changeTab, activeTab }) => {
   return (
-    <div className='tab-buttons'>
+    <div className='tab-buttons' style={{ width: 300 }}>
       {buttons.map((button, i) => {
-        return <button key={i} className={button === activeTab ? 'active' : ''} onClick={() => changeTab(button)}>{button}</button>
+        return <button id={button} key={i} className={button === activeTab ? 'tabButton active ' + button : 'tabButton'} onClick={() => changeTab(button)}>{button}</button>
       })}
+      <div className='bottomLine' />
     </div>
   )
 }
@@ -42,7 +49,10 @@ class Tabs extends React.Component {
         })}
 
         <TabButtons activeTab={this.state.activeTab} buttons={buttons} changeTab={this.changeTab} />
-        {content}
+        <div className='overflow-hidden'>
+          {content}
+        </div>
+
 
       </div>
     )
