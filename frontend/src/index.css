@@ -48,12 +48,15 @@ code {
   color: #686868;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: height 0.2s ease;
 }
 
 .nook-phone-center {
   background: white;
   margin:0 auto;
   /* width: 100vw; */
+  overflow: hidden;
+  transition: height 0.2s ease;
 }
 
 .chart-wrapper {
@@ -218,7 +221,10 @@ code {
 }
 
 .overflow-hidden {
-  overflow: hidden;
+  /* overflow: hidden; */
+  width:100%;
+  position: relative;
+  transition: height 0.2s ease;
 }
 
 /* dialog box */
@@ -257,3 +263,51 @@ code {
   background: #FDFEFE  ;
   border-radius: 40px;
 }
+
+.data-tab-enter{
+  position: absolute;
+  transform: translateX(-110%);
+}
+.data-tab-enter-active{
+  transform: translateX(0%);
+  transition: all 0.5s;
+}
+.data-tab-exit{
+  position: absolute;
+}
+.data-tab-exit-active{
+  transform: translateX(-110%);
+  transition: all 0.5s;
+}
+
+.prediction-tab-enter{
+  position:absolute;
+  opacity: 0;
+}
+.prediction-tab-enter-active{
+  opacity: 1;
+  transition: all 0.5s;
+}
+.prediction-tab-exit{
+  position: absolute;
+}
+.prediction-tab-exit-active{
+  opacity: 0;
+  transition: all 0.5s;
+}
+
+ .map-tab-enter{
+   position: absolute;
+   transform: translateX(110%);
+}
+ .map-tab-enter-active{
+  transform: translateX(0%);
+  transition: transform 0.5s;
+} 
+.map-tab-exit{
+  position:absolute;
+}
+.map-tab-exit-active{
+   transform: translateX(110%);
+   transition: all 0.5s;
+} 

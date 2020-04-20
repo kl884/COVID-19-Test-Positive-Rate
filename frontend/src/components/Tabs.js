@@ -1,11 +1,5 @@
 import React from 'react'
 
-function BottomLine (props) {
-  return (
-    <div className='buttomLine' />
-  )
-}
-
 const Tab = props => {
   return (
     <>
@@ -28,31 +22,24 @@ const TabButtons = ({ buttons, changeTab, activeTab }) => {
 class Tabs extends React.Component {
   constructor (props) {
     super(props)
+
     this.state = {
-      activeTab: this.props.children[1].props.label
+      activeTab: this.props.activeTab
     }
-    this.changeTab = this.changeTab.bind(this)
+    this.changeTab = this.props.handleTabClick
   }
 
-  changeTab (tab) {
-    this.setState({ activeTab: tab })
-  }
+  // changeTab (tab) {
+  //   this.setState({ activeTab: tab })
+  // }
 
   render () {
-    let content
     const buttons = []
     return (
       <div>
-        {React.Children.map(this.props.children, child => {
-          buttons.push(child.props.label)
-          if (child.props.label === this.state.activeTab) content = child.props.children
-        })}
+        {this.props.tabs.map(tab => { buttons.push(tab) })}
 
-        <TabButtons activeTab={this.state.activeTab} buttons={buttons} changeTab={this.changeTab} />
-        <div className='overflow-hidden'>
-          {content}
-        </div>
-
+        <TabButtons activeTab={this.props.activeTab} buttons={buttons} changeTab={this.changeTab} />
 
       </div>
     )
