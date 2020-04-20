@@ -21,7 +21,7 @@ class App extends React.Component {
       charts: [],
       activeTab: 'Prediction',
       tabs: ['Data', 'Prediction', 'Map'],
-      height: window.innerWidth > 800 ? '360px' : '720px'
+      height: window.innerWidth > 800 ? '360px' : '650px'
     }
   }
 
@@ -48,9 +48,9 @@ class App extends React.Component {
     })
   }
 
-  handleOnLoad (height) {
+  handleOnLoad (choroplethHeight) {
     this.setState({
-      height: height
+      height: choroplethHeight + 50
     })
   }
 
@@ -68,7 +68,7 @@ class App extends React.Component {
       <div>
         <div className='dialog-box'>
           <h2 className='dialog-box__name'>Tips</h2>
-          <p>Hover over the points to see tooltips, or if you are on mobile, touch the points
+          <p>Hover over the points to see tooltips, and click on the graph to show all the points.
           </p>
         </div>
 
@@ -201,7 +201,7 @@ class App extends React.Component {
         </div>
 
         <div className='dialog-box'>
-          <p>Data is pulled from  <a href='https://covidtracking.com/'>The COVID Tracking Project</a> and updated at 5:30PM PST
+          <p>Data is pulled from  <a href='https://covidtracking.com/'>The COVID Tracking Project</a> and updated daily at 5:30PM PST
           </p>
           <p>This app is in constant development. Suggestions, support, and contributions are available
             through <a href='https://github.com/eestanleyland/COVID-19-Test-Positive-Rate'>Github</a>
