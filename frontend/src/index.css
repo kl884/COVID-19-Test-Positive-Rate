@@ -64,6 +64,7 @@ code {
   display:inline-block;
   vertical-align: top;
   width: 96%;
+  -webkit-user-select: none;
 }
 
 /* .main.chart-wrapper {

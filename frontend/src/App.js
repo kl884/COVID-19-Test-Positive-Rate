@@ -50,7 +50,7 @@ class App extends React.Component {
 
   handleOnLoad (choroplethHeight) {
     this.setState({
-      height: choroplethHeight + 50
+      height: choroplethHeight + 100
     })
   }
 
