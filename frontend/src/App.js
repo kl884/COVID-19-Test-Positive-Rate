@@ -21,7 +21,7 @@ class App extends React.Component {
       charts: [],
       activeTab: 'Prediction',
       tabs: ['Data', 'Prediction', 'Map'],
-      height: window.innerWidth > 800 ? '360px' : '650px'
+      height: null
     }
   }
 
@@ -97,7 +97,7 @@ class App extends React.Component {
             <Tabs handleTabClick={this.changeTab} activeTab={this.state.activeTab} tabs={this.state.tabs} />
             <div
               className='overflow-hidden'
-              style={{ height: this.state.height }}
+              style={{ height: this.state.height !== null ? this.state.height : window.innerWidth > 800 ? '360px' : '650px' }} // Facebook in-app browser issue
             >
               <CSSTransition
                 in={this.state.activeTab === 'Data'}
