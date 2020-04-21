@@ -10,7 +10,6 @@
   "author": "Ronny",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.656.0",
     "body-parser": "^1.19.0",
     "csv-parser": "^2.3.2",
     "express": "^4.17.1"
