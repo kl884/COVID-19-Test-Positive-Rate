@@ -12,7 +12,7 @@ COLUMNS_FOR_POPULATION = ['POPESTIMATE2019']
 COLUMNS_FOR_PRED_DATA = ['state','date','positiveIncrease_pdf','positive_cdf']
 RELATIVE_PATH_CSV = ('./test.csv','/home/ubuntu/project/COVID-19-Test-Positive-Rate/backend/data.csv')[os.environ.get('PYTHON_ENVIRONMENT') == 'prod']
 RELATIVE_PATH_CSV_PRED = ('./predData.csv','/home/ubuntu/project/COVID-19-Test-Positive-Rate/backend/predData.csv')[os.environ.get('PYTHON_ENVIRONMENT') == 'prod']
-logging.basicConfig(filename='injectData.log',level=logging.DEBUG)
+logging.basicConfig(filename='~/injectData.log',level=logging.DEBUG)
 
 # for choropleth graph
 def slice_latest(df):
