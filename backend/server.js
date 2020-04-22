@@ -6,8 +6,8 @@ const http = require('http')
 const csv = require('csv-parser')
 const fs = require('fs')
 
-const CSV_NAME_TREND = '~/test.csv'
-const CSV_NAME_PRED = '~/predData.csv'
+const CSV_NAME_TREND = '/home/ubuntu/test.csv'
+const CSV_NAME_PRED = '/home/ubuntu/predData.csv'
 
 const router = express.Router()
 
