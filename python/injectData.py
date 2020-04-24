@@ -130,6 +130,7 @@ def slice_state(df, state=None):
     if state is not None:
         df = df.loc[df['state'] == state]
     
+    active_column = df['positive'] - df['death'] - df['recovered']
     data_for_graph = {
         'state': df['state'],
         'total_pos_rate': df['positive']/df['total']*100,
@@ -140,12 +141,12 @@ def slice_state(df, state=None):
         'date':list(map(lambda date: dateutil.parser.parse(date).timestamp()*1000, df['dateChecked'])), 
         
         'totalTestResultsIncrease':df['totalTestResultsIncrease'],
-        'positive': df['positive'].fillna(0),
+        'positive': df['positive'],
 
         # stack plot
-        'death': df['death'].fillna(0),
-        'recovered': df['recovered'].fillna(0),
-        'active': df['positive'].fillna(0) - df['death'].fillna(0) - df['recovered'].fillna(0)
+        'death': df['death'],
+        'recovered': df['recovered'].where(active_column >= 0, df['positive'] - df['death']),
+        'active': np.clip(active_column, 0, None)
     }
     result_df = pd.DataFrame(data_for_graph)
     result_df.to_csv(RELATIVE_PATH_CSV, index=False, header=True)
@@ -165,6 +166,7 @@ def log_output(message, log_type='info'):
 if __name__ == '__main__':
     try:
         df = pd.read_csv('http://covidtracking.com/api/states/daily.csv', usecols=COLUMNS_FOR_POS_TREND)
+        df = df.fillna(0)
         log_output("Fetch data count: {}".format(len(df.index)))
         df_states = slice_state(df)
         log_output("Sliced state count: {}".format(len(df_states.index)))
