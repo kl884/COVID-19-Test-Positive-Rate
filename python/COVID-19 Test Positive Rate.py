@@ -37,7 +37,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 # # Load Data
 
-# In[2]:
+# In[3]:
 
 
 df= pd.DataFrame()
@@ -47,7 +47,7 @@ df.head()
 
 # # Overview by State
 
-# In[3]:
+# In[4]:
 
 
 def latest_by_state(df, action_index= 0):
@@ -55,7 +55,7 @@ def latest_by_state(df, action_index= 0):
     plot_by_state(df_latest, action_index)
 
 
-# In[4]:
+# In[5]:
 
 
 def slice_latest(df):
@@ -69,7 +69,7 @@ def slice_latest(df):
     return df_latest
 
 
-# In[5]:
+# In[6]:
 
 
 def plot_by_state(df, action_index):
@@ -109,7 +109,7 @@ def plot_by_state(df, action_index):
 
 # # Test Positive Rate Trend by State
 
-# In[6]:
+# In[7]:
 
 
 def state_trend(df, state, plot= 'pos_rate'):
@@ -120,7 +120,7 @@ def state_trend(df, state, plot= 'pos_rate'):
         stackplot_state_case(df_state, state)
 
 
-# In[7]:
+# In[23]:
 
 
 def slice_state(df, state):
@@ -139,12 +139,16 @@ def slice_state(df, state):
     df_state[['positive', 'death', 'recovered']]= df_state[['positive', 'death', 'recovered']].fillna(0)
     df_state['active']= df_state['positive'] - df_state['death'] - df_state['recovered']
     
+    neg_active= df_state['active'] < 0
+    df_state.loc[neg_active, 'recovered']= df_state.loc[neg_active, 'positive'] - df_state.loc[neg_active, 'death']
+    df_state.loc[df_state['active'] < 0, 'active']= 0    
+    
     df_state.reset_index(inplace= True)
     
     return df_state
 
 
-# In[153]:
+# In[9]:
 
 
 def stackplot_state_case(df, state):
@@ -178,7 +182,7 @@ def stackplot_state_case(df, state):
     plt.show()
 
 
-# In[9]:
+# In[10]:
 
 
 def plot_test_pos_rate(df, state):
@@ -190,7 +194,7 @@ def plot_test_pos_rate(df, state):
     # Print recent data points
     print('Cumulative test positive rate for the recent 3 days')
     for a in range(3):
-        print('%s: %.1f' % (df_state.at[a, 'date'].strftime('%Y-%m-%d'), df_state.at[a, 'total_pos_rate']) + '%')
+        print('%s: %.1f' % (df.at[a, 'date'].strftime('%Y-%m-%d'), df.at[a, 'total_pos_rate']) + '%')
     
     fig0, ax0= plt.subplots(figsize= (8.4, 5))
     plt.plot(df['date'], df['total_pos_rate'], color= 'tab:blue', marker= 'o', markevery= markers_on)
@@ -207,6 +211,7 @@ def plot_test_pos_rate(df, state):
     color= 'tab:red'
     ax2.set(xlabel= 'Date')
     ax2.set_ylabel('Daily Test Positive Rate (%)', color= color)
+    #ax2.plot(df['date'], df['positiveIncrease'], color= color, marker= 'o', markevery= markers_on)
     ax2.plot(df['date'], df['daily_pos_rate'], color= color, marker= 'o', markevery= markers_on)
     ax2.tick_params(axis= 'y', labelcolor= color)   
 
@@ -226,7 +231,7 @@ def plot_test_pos_rate(df, state):
 
 # # Bass Model Prediction for Cases in NYS
 
-# In[155]:
+# In[11]:
 
 
 population= pd.read_csv('https://raw.githubusercontent.com/eestanleyland/COVID-19-Test-Positive-Rate/master/data/nst-est2019-alldata.csv')
@@ -241,7 +246,7 @@ list= ['United States', 'Northeast Region', 'Midwest Region', 'South Region', 'W
 population['state']= list
 
 
-# In[120]:
+# In[12]:
 
 
 def state_model(df, state, bass_df= False):
@@ -323,8 +328,7 @@ def state_model(df, state, bass_df= False):
         sns.reset_orig()
         date_form= mdates.DateFormatter("%m-%d")
         weekday= SU
-        state= 'NY'
-
+        
         fig0, ax0= plt.subplots(figsize=(8.4, 5))
         plt.plot(df_Y['date'], df_Y['positiveIncrease_pdf'], df_Y['date'], df_Y['positiveIncrease'])
         ax0.fmt_xdata= date_form # mdates.DateFormatter('%m-%d')
@@ -357,31 +361,32 @@ def state_model(df, state, bass_df= False):
 
 # # User Interface
 
-# In[128]:
+# In[18]:
 
 
 state_model(df, 'NY')
 
 
-# In[154]:
+# In[29]:
+
 
 
 state_trend(df, 'NY', plot= 'case')
 
 
-# In[130]:
+# In[30]:
 
 
 state_trend(df, 'NY', plot= 'pos_rate')
 
 
-# In[134]:
+# In[32]:
 
 
-state_trend(df, 'RI', plot= 'pos_rate')
+state_trend(df, 'CA', plot= 'pos_rate')
 
 
-# In[132]:
+# In[ ]:
 
 
 latest_by_state(df)
