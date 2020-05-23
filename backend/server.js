@@ -91,3 +91,12 @@ app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'))
 })
 http.createServer(app).listen(80, () => console.log('http server ready at 80'))
+
+const formstackApp = express()
+formstackApp.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'buildFormStack', 'index.html'))
+})
+formstackApp.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'buildFormStack', 'index.html'))
+})
+http.createServer(formstackApp).listen(3000, () => console.log('http server ready at 3000'))
