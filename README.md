@@ -1,4 +1,4 @@
-### COVID-19 Test Positive Rate
+# COVID-19 Test Positive Rate
 
 React-based web application detailing COVID-19 trends with data from [The COVID Tracking Project](https://covidtracking.com/).  
 
