@@ -4,7 +4,8 @@ import { CumulChart, DailyChart, PredDailyChart, PredCumulChart, StackedChart } 
 import { getData } from './components/HelperFunc.js'
 import ComboBox from './components/AutoCompleteBar.js'
 import ChoroplethMap from './components/ChoroplethMap.js'
-import { Tabs, Tab } from './components/Tabs.js'
+import { Tabs } from './components/Tabs.js'
+import { CSSTransition } from 'react-transition-group'
 Chart.defaults.global.defaultFontFamily = 'Roboto, sans-serif'
 
 // App
@@ -13,16 +14,18 @@ class App extends React.Component {
     super(props)
     this.handleChange = this.handleChange.bind(this)
     this.changeTab = this.changeTab.bind(this)
+    this.handleOnEnter = this.handleOnEnter.bind(this)
+    this.handleOnLoad = this.handleOnLoad.bind(this)
     this.state = {
       data: null,
       charts: [],
-      activeTab: 'Prediction'
+      activeTab: 'Prediction',
+      tabs: ['Data', 'Prediction', 'Map'],
+      height: null
     }
   }
 
   changeTab (tab) {
-    console.log('changeTab called')
-
     this.setState({
       activeTab: tab
     })
@@ -38,14 +41,18 @@ class App extends React.Component {
       })
   }
 
-  // componentWillMount () {
-  //   getData('NY')
-  //     .then((data) => {
-  //       this.setState({
-  //         data: data
-  //       })
-  //     })
-  // }
+  handleOnEnter (el) {
+    const height = el.offsetHeight
+    this.setState({
+      height: height
+    })
+  }
+
+  handleOnLoad (choroplethHeight) {
+    this.setState({
+      height: choroplethHeight + 100
+    })
+  }
 
   componentDidMount () {
     getData('NY')
@@ -61,7 +68,7 @@ class App extends React.Component {
       <div>
         <div className='dialog-box'>
           <h2 className='dialog-box__name'>Tips</h2>
-          <p>Hover over the points to see tooltips, or if you are on mobile, touch the points
+          <p>Hover over the points to see tooltips, and click on the graph to show all the points.
           </p>
         </div>
 
@@ -87,10 +94,20 @@ class App extends React.Component {
             <div className='main chart-wrapper'>
               <ComboBox onHandleChange={this.handleChange} />
             </div>
-            <Tabs>
-              <Tab label='Data'>
+            <Tabs handleTabClick={this.changeTab} activeTab={this.state.activeTab} tabs={this.state.tabs} />
+            <div
+              className='overflow-hidden'
+              style={{ height: this.state.height !== null ? this.state.height : window.innerWidth > 800 ? '360px' : '650px' }} // Facebook in-app browser issue
+            >
+              <CSSTransition
+                in={this.state.activeTab === 'Data'}
+                timeout={500}
+                classNames='data-tab'
+                unmountOnExit
+                label='Data'
+                onEnter={this.handleOnEnter}
+              >
                 <div>
-
                   {this.state.data &&
                     <div className='sub chart-wrapper'>
                       <StackedChart
@@ -103,7 +120,6 @@ class App extends React.Component {
                       />
                     </div>}
                   {this.state.data &&
-
                     <div className='sub chart-wrapper'>
                       <CumulChart
                         data={this.state.data[0].data}
@@ -123,32 +139,48 @@ class App extends React.Component {
                       />
                     </div>}
                 </div>
-              </Tab>
-              <Tab label='Prediction'>
-                {this.state.data &&
-                  <div className='sub chart-wrapper'>
-                    <PredDailyChart
-                      dataModel={this.state.data[3].data}
-                      dataActual={this.state.data[4].data}
-                      title={this.state.data[3].title}
-                      yLabel='Positive Cases'
-                      color='#3E517A'
-                    />
-                  </div>}
-                {this.state.data &&
-                  <div className='sub chart-wrapper'>
-                    <PredCumulChart
-                      dataModel={this.state.data[5].data}
-                      dataActual={this.state.data[6].data}
-                      title={this.state.data[5].title}
-                      color='#3E517A'
-                    />
-                  </div>}
-              </Tab>
-              <Tab label='Map'>
-                <ChoroplethMap />
-              </Tab>
-            </Tabs>
+              </CSSTransition>
+              <CSSTransition
+                in={this.state.activeTab === 'Prediction'}
+                timeout={500}
+                classNames='prediction-tab'
+                unmountOnExit
+                label='Prediction'
+                onEnter={this.handleOnEnter}
+              >
+                <div id='PredictionTab' style={{ width: '100%' }}>
+                  {this.state.data &&
+                    <div className='sub chart-wrapper'>
+                      <PredDailyChart
+                        dataModel={this.state.data[3].data}
+                        dataActual={this.state.data[4].data}
+                        title={this.state.data[3].title}
+                        yLabel='Positive Cases'
+                        color='#3E517A'
+                      />
+                    </div>}
+                  {this.state.data &&
+                    <div className='sub chart-wrapper'>
+                      <PredCumulChart
+                        dataModel={this.state.data[5].data}
+                        dataActual={this.state.data[6].data}
+                        title={this.state.data[5].title}
+                        color='#3E517A'
+                      />
+                    </div>}
+                </div>
+              </CSSTransition>
+              <CSSTransition
+                in={this.state.activeTab === 'Map'}
+                timeout={500}
+                classNames='map-tab'
+                unmountOnExit
+                label='Map'
+              >
+                <ChoroplethMap onLoad={this.handleOnLoad} />
+
+              </CSSTransition>
+            </div>
           </div>
           <div style={{ transform: 'rotate(180deg)' }}>
             <svg
@@ -169,27 +201,16 @@ class App extends React.Component {
         </div>
 
         <div className='dialog-box'>
-          <p>Data is pulled from  <a
-            href='https://covidtracking.com/'
-          >The COVID Tracking Project
-          </a>
+          <p>Data is pulled from  <a href='https://covidtracking.com/'>The COVID Tracking Project</a> and updated daily at 5:30PM PST
           </p>
-          <p>This app is in constant development. Suggestions, support, and contributions are available through <a
-            href='https://github.com/eestanleyland/COVID-19-Test-Positive-Rate'
-                                                                                                                >Github
-          </a>
+          <p>This app is in constant development. Suggestions, support, and contributions are available
+            through <a href='https://github.com/eestanleyland/COVID-19-Test-Positive-Rate'>Github</a>
           </p>
           <p>
-            Website by <a
-              href='https://www.linkedin.com/in/ronnylin/'
-            >Ronny Lin
-            </a>
+            Website by <a href='https://www.linkedin.com/in/ronnylin/'>Ronny Lin</a>
           </p>
           <p>
-            Data analytics by <a
-              href='https://www.linkedin.com/in/kystanleylin/'
-            >Stanley Lin
-            </a>
+            Data analytics by <a href='https://www.linkedin.com/in/kystanleylin/'>Stanley Lin</a>
           </p>
         </div>
       </div>

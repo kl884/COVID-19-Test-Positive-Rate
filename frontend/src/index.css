@@ -20,6 +20,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
 code {
@@ -47,12 +48,15 @@ code {
   color: #686868;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: height 0.3s ease;
 }
 
 .nook-phone-center {
   background: white;
   margin:0 auto;
   /* width: 100vw; */
+  overflow: hidden;
+  transition: height 0.3s ease;
 }
 
 .chart-wrapper {
@@ -60,6 +64,7 @@ code {
   display:inline-block;
   vertical-align: top;
   width: 96%;
+  -webkit-user-select: none;
 }
 
 /* .main.chart-wrapper {
@@ -158,37 +163,69 @@ code {
   }
 }
 
+
 /* tabs */
 .tabs{
   font-family:arial;
   margin:0 auto;
   width:70%;
-  text-align:center;
+  /* text-align:center; */
   margin-top:15vh;
 }
 
 .tab-buttons{
+  margin: auto;
   margin-bottom:25px;
   text-align:center;
+  display: block;
+  max-width:300px;
 }
 
-button{
+.tabButton{
   /* margin-right:15px; */
-  font-size:20px;
+  font-size:18px;
   background:transparent;
   border:none;
   outline:none;
-  padding:10px 20px ;
+  padding:10px 0;
+  width:100px;
   cursor:pointer;
   color:rgba(0,0,0,.4);
   transition:all ease-in-out .2s;
-  border-bottom:2px solid transparent;
-  
 }
+.tabButton.Data.active ~ .bottomLine {
+  margin-left: 0;
+}
+.tabButton.Prediction.active ~ .bottomLine {
+  margin-left:100px;
+}
+.tabButton.Map.active ~ .bottomLine {
+  margin-left: 200px;
+}
+
+.bottomLine {
+  margin: 0;
+  width:100px;
+  height: 2px;
+  background: #42b3f4;
+  border: none;
+  transition: .3s ease-in-out;
+}
+
+.tabButton:hover{
+  color: black;
+}
+
 .active{
-  border-bottom:2px solid #42b3f4;
- 
-  color:black;
+  /* border-bottom:2px solid #42b3f4; */
+  color:black; 
+}
+
+.overflow-hidden {
+  /* overflow: hidden; */
+  width:100%;
+  position: relative;
+  transition: height 0.3s ease;
 }
 
 /* dialog box */
@@ -227,3 +264,51 @@ button{
   background: #FDFEFE  ;
   border-radius: 40px;
 }
+
+.data-tab-enter{
+  position: absolute;
+  transform: translateX(-110%);
+}
+.data-tab-enter-active{
+  transform: translateX(0%);
+  transition: all 0.5s;
+}
+.data-tab-exit{
+  position: absolute;
+}
+.data-tab-exit-active{
+  transform: translateX(-110%);
+  transition: all 0.5s;
+}
+
+.prediction-tab-enter{
+  position:absolute;
+  opacity: 0;
+}
+.prediction-tab-enter-active{
+  opacity: 1;
+  transition: all 0.5s;
+}
+.prediction-tab-exit{
+  position: absolute;
+}
+.prediction-tab-exit-active{
+  opacity: 0;
+  transition: all 0.5s;
+}
+
+ .map-tab-enter{
+   position: absolute;
+   transform: translateX(110%);
+}
+ .map-tab-enter-active{
+  transform: translateX(0%);
+  transition: transform 0.5s;
+} 
+.map-tab-exit{
+  position:absolute;
+}
+.map-tab-exit-active{
+   transform: translateX(110%);
+   transition: all 0.5s;
+} 

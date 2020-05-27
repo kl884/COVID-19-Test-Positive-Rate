@@ -5,17 +5,9 @@ const path = require('path')
 const http = require('http')
 const csv = require('csv-parser')
 const fs = require('fs')
-const https = require('https')
-const line = require('@line/bot-sdk')
 
-const config = {
-  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
-  channelSecret: process.env.CHANNEL_SECRET
-}
-const client = new line.Client(config)
-
-const CSV_NAME_TREND = 'data.csv'
-const CSV_NAME_PRED = 'predData.csv'
+const CSV_NAME_TREND = '/home/ubuntu/test.csv'
+const CSV_NAME_PRED = '/home/ubuntu/predData.csv'
 
 const router = express.Router()
 
@@ -100,76 +92,12 @@ app.get('/*', function (req, res) {
 })
 http.createServer(app).listen(80, () => console.log('http server ready at 80'))
 
-// Line Bot
-const httpsApp = express()
-httpsApp.use(line.middleware(config))
-
-httpsApp.post('/line', (req, res) => {
-  Promise
-    .all(req.body.events.map(handleEvent))
-    .then((result) => res.json(result))
-    .catch((err) => {
-      console.error(err)
-      res.status(500).end()
-    })
+const formstackApp = express()
+formstackApp.use(express.static(path.join(__dirname, 'buildFormStack')))
+formstackApp.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'buildFormStack', 'index.html'))
 })
-
-function getProfileName (event) {
-  return new Promise((resolve, reject) => {
-    if (event.source.type !== 'user') return resolve(null)
-    client.getProfile(event.source.userId)
-      .then((profile) => {
-        console.log(profile.displayName)
-        console.log(profile.userId)
-        console.log(profile.pictureUrl)
-        console.log(profile.statusMessage)
-        resolve(profile.displayName)
-      })
-      .catch((err) => {
-        reject(new Error('something went wrong when calling getProfile ', err))
-      })
-  })
-}
-
-function handleEvent (event) {
-  console.log('handle line event: ', event)
-
-  if (event.type !== 'message' || event.message.type !== 'text') {
-    // ignore non-text-message event
-    return Promise.resolve(null)
-  }
-
-  getProfileName(event)
-    .then((displayName) => {
-      const echo = { type: 'text', text: `${displayName} 說 ${event.message.text}` }
-      return client.replyMessage(event.replyToken, echo)
-    })
-    .catch((err) => {
-      console.log('Error in getProfile', err)
-      return client.replyMessage(event.replyToken, {
-        type: 'text',
-        text: '我在處理訊息時出了問題'
-      })
-    })
-
-  // create a echoing text message
-
-  // use reply API
-}
-httpsApp.use((err, req, res, next) => {
-  if (err instanceof line.SignatureValidationFailed) {
-    res.status(401).send(err.signature)
-    return
-  } else if (err instanceof line.JSONParseError) {
-    res.status(400).send(err.raw)
-    return
-  }
-  next(err) // will throw default 500
+formstackApp.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'buildFormStack', 'index.html'))
 })
-
-const optionshttps = {
-  key: fs.readFileSync('/home/ubuntu/ssl/private.key', 'utf8'),
-  cert: fs.readFileSync('/home/ubuntu/ssl/certificate.crt', 'utf8'),
-  ca: fs.readFileSync('/home/ubuntu/ssl/ca_bundle.crt', 'utf8')
-}
-https.createServer(optionshttps, httpsApp).listen(443, () => console.log('https server ready at 443!'))
+http.createServer(formstackApp).listen(3000, () => console.log('http server ready at 3000'))

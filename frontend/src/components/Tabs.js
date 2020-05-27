@@ -10,10 +10,11 @@ const Tab = props => {
 
 const TabButtons = ({ buttons, changeTab, activeTab }) => {
   return (
-    <div className='tab-buttons'>
+    <div className='tab-buttons' style={{ width: 300 }}>
       {buttons.map((button, i) => {
-        return <button key={i} className={button === activeTab ? 'active' : ''} onClick={() => changeTab(button)}>{button}</button>
+        return <button id={button} key={i} className={button === activeTab ? 'tabButton active ' + button : 'tabButton'} onClick={() => changeTab(button)}>{button}</button>
       })}
+      <div className='bottomLine' />
     </div>
   )
 }
@@ -21,28 +22,24 @@ const TabButtons = ({ buttons, changeTab, activeTab }) => {
 class Tabs extends React.Component {
   constructor (props) {
     super(props)
+
     this.state = {
-      activeTab: this.props.children[1].props.label
+      activeTab: this.props.activeTab
     }
-    this.changeTab = this.changeTab.bind(this)
+    this.changeTab = this.props.handleTabClick
   }
 
-  changeTab (tab) {
-    this.setState({ activeTab: tab })
-  }
+  // changeTab (tab) {
+  //   this.setState({ activeTab: tab })
+  // }
 
   render () {
-    let content
     const buttons = []
     return (
       <div>
-        {React.Children.map(this.props.children, child => {
-          buttons.push(child.props.label)
-          if (child.props.label === this.state.activeTab) content = child.props.children
-        })}
+        {this.props.tabs.map(tab => { buttons.push(tab) })}
 
-        <TabButtons activeTab={this.state.activeTab} buttons={buttons} changeTab={this.changeTab} />
-        {content}
+        <TabButtons activeTab={this.props.activeTab} buttons={buttons} changeTab={this.changeTab} />
 
       </div>
     )

@@ -3,6 +3,8 @@ import dateutil.parser
 import os
 import numpy as np
 from scipy.optimize import leastsq
+import logging
+from datetime import datetime
 
 # Constants
 COLUMNS_FOR_POS_TREND = ['state','positive','positiveIncrease','totalTestResultsIncrease','total','dateChecked','death','recovered']
@@ -10,6 +12,8 @@ COLUMNS_FOR_POPULATION = ['POPESTIMATE2019']
 COLUMNS_FOR_PRED_DATA = ['state','date','positiveIncrease_pdf','positive_cdf']
 RELATIVE_PATH_CSV = ('./test.csv','/home/ubuntu/project/COVID-19-Test-Positive-Rate/backend/data.csv')[os.environ.get('PYTHON_ENVIRONMENT') == 'prod']
 RELATIVE_PATH_CSV_PRED = ('./predData.csv','/home/ubuntu/project/COVID-19-Test-Positive-Rate/backend/predData.csv')[os.environ.get('PYTHON_ENVIRONMENT') == 'prod']
+LOG_FILE = ('injectData.log','/home/ubuntu/project/COVID-19-Test-Positive-Rate/python/injectData.log')[os.environ.get('PYTHON_ENVIRONMENT') == 'prod']
+logging.basicConfig(filename=LOG_FILE,level=logging.DEBUG)
 
 # for choropleth graph
 def slice_latest(df):
@@ -126,6 +130,7 @@ def slice_state(df, state=None):
     if state is not None:
         df = df.loc[df['state'] == state]
     
+    active_column = df['positive'] - df['death'] - df['recovered']
     data_for_graph = {
         'state': df['state'],
         'total_pos_rate': df['positive']/df['total']*100,
@@ -136,22 +141,36 @@ def slice_state(df, state=None):
         'date':list(map(lambda date: dateutil.parser.parse(date).timestamp()*1000, df['dateChecked'])), 
         
         'totalTestResultsIncrease':df['totalTestResultsIncrease'],
-        'positive': df['positive'].fillna(0),
+        'positive': df['positive'],
 
         # stack plot
-        'death': df['death'].fillna(0),
-        'recovered': df['recovered'].fillna(0),
-        'active': df['positive'].fillna(0) - df['death'].fillna(0) - df['recovered'].fillna(0)
+        'death': df['death'],
+        'recovered': df['recovered'].where(active_column >= 0, df['positive'] - df['death']),
+        'active': np.clip(active_column, 0, None)
     }
     result_df = pd.DataFrame(data_for_graph)
     result_df.to_csv(RELATIVE_PATH_CSV, index=False, header=True)
     return result_df
 
+def log_output(message, log_type='info'):
+    cur_time_string = "[{}] ".format(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+    if log_type == 'info':
+        logging.info(cur_time_string + message)
+    elif log_type == 'error':
+        if isinstance(message, Exception):
+            logging.error(cur_time_string + str(message))
+        elif isinstance(message, str):
+            logging.error(cur_time_string + message)
+        
+
 if __name__ == '__main__':
-    # df = pd.DataFrame()
-    df = pd.read_csv('http://covidtracking.com/api/states/daily.csv', usecols=COLUMNS_FOR_POS_TREND)
-    print(df.head())
-    df_states = slice_state(df)
-    print(df_states)
-    df_prediction = prediction_data(df)
-    print(df_prediction)
+    try:
+        df = pd.read_csv('http://covidtracking.com/api/states/daily.csv', usecols=COLUMNS_FOR_POS_TREND)
+        df = df.fillna(0)
+        log_output("Fetch data count: {}".format(len(df.index)))
+        df_states = slice_state(df)
+        log_output("Sliced state count: {}".format(len(df_states.index)))
+        df_prediction = prediction_data(df)
+        log_output("Prediction data count: {}".format(len(df_prediction.index)))
+    except Exception as e:
+        log_output(e, log_type='error')

@@ -54,7 +54,7 @@ class ChoroplethMap extends React.Component {
           // tooltip content
           return '<div class="hoverinfo">' +
             '<strong>' + geo.properties.name + '</strong>' +
-            '<br>active cases: <strong>' + data.active.slice(0, -2) + '</strong>' +
+            '<br>active cases: <strong>' + data.active.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</strong>' +
             '<br>test positive rate: <strong>' + data.numberOfThings.toFixed(1) + '%</strong>' +
             '</div>'
         }
@@ -67,15 +67,15 @@ class ChoroplethMap extends React.Component {
         defaultFill: '#eee'
       },
       data: dataset
-      //   setProjection: function (element) {
-      //     var projection = d3.geo.mercator()
-      //       .center([-106.3468, 68.1304]) // always in [East Latitude, North Longitude]
-      //       .scale(200)
-      //       .translate([element.offsetWidth / 2, element.offsetHeight / 2])
+      // setProjection: function (element) {
+      //   var projection = d3.geo.mercator()
+      //     .center([-106.3468, 68.1304]) // always in [East Latitude, North Longitude]
+      //     .scale(200)
+      //     .translate([element.offsetWidth / 2, element.offsetHeight / 2])
 
-    //     var path = d3.geo.path().projection(projection)
-    //     return { path: path, projection: projection }
-    //   }
+      //   var path = d3.geo.path().projection(projection)
+      //   return { path: path, projection: projection }
+      // }
     })
     window.addEventListener('resize', function () {
       map.resize()
@@ -89,6 +89,7 @@ class ChoroplethMap extends React.Component {
           data: data.data
         })
         this.createMap()
+        this.props.onLoad(document.getElementById('cloropleth_map').offsetHeight)
       })
   }
 
