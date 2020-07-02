@@ -5,6 +5,8 @@ import numpy as np
 from scipy.optimize import leastsq
 import logging
 from datetime import datetime
+import traceback
+
 
 # Constants
 COLUMNS_FOR_POS_TREND = ['state','positive','positiveIncrease','totalTestResultsIncrease','total','dateChecked','death','recovered']
@@ -129,7 +131,14 @@ def slice_state(df, state=None):
     # df_state= df.loc[df['state'] == state]
     if state is not None:
         df = df.loc[df['state'] == state]
-    
+    # print(df['dateChecked'][0])
+    # print(type(df['dateChecked'][0]))
+    def PrintTypeAndValue(date):
+        if isinstance(date, int):
+            return None
+        return dateutil.parser.parse(date).timestamp()*1000
+    # temp = map(PrintTypeAndValue, df['dateChecked'])
+    # quit()
     active_column = df['positive'] - df['death'] - df['recovered']
     data_for_graph = {
         'state': df['state'],
@@ -138,7 +147,8 @@ def slice_state(df, state=None):
 
         # date is in ISO 8601 format by default, now converting to miliseconds unix timestamp
         # REMINDER can use ISO 8601 string for drawing chart but will test later
-        'date':list(map(lambda date: dateutil.parser.parse(date).timestamp()*1000, df['dateChecked'])), 
+        
+        'date':list(map(PrintTypeAndValue,df['dateChecked'])), 
         
         'totalTestResultsIncrease':df['totalTestResultsIncrease'],
         'positive': df['positive'],
@@ -173,4 +183,5 @@ if __name__ == '__main__':
         df_prediction = prediction_data(df)
         log_output("Prediction data count: {}".format(len(df_prediction.index)))
     except Exception as e:
+        # traceback.print_exc()
         log_output(e, log_type='error')
