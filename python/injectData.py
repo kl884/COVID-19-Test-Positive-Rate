@@ -159,6 +159,7 @@ def slice_state(df, state=None):
         'active': np.clip(active_column, 0, None)
     }
     result_df = pd.DataFrame(data_for_graph)
+    result_df = result_df.dropna(axis=0, subset=['date'])
     result_df.to_csv(RELATIVE_PATH_CSV, index=False, header=True)
     return result_df
 
@@ -168,7 +169,7 @@ def log_output(message, log_type='info'):
         logging.info(cur_time_string + message)
     elif log_type == 'error':
         if isinstance(message, Exception):
-            logging.error(cur_time_string + str(message))
+            logging.error(cur_time_string + str(message) + '\n' + traceback.print_exc())
         elif isinstance(message, str):
             logging.error(cur_time_string + message)
         
@@ -183,5 +184,4 @@ if __name__ == '__main__':
         df_prediction = prediction_data(df)
         log_output("Prediction data count: {}".format(len(df_prediction.index)))
     except Exception as e:
-        # traceback.print_exc()
         log_output(e, log_type='error')
