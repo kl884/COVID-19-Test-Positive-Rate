@@ -65,7 +65,8 @@ def prediction_data(df, test=False):
 
         df_Y= df_state[['date', 'positiveIncrease', 'positive']].iloc[::-1]
         df_Y.reset_index(inplace= True)
-
+        print('df_Y in beginnign')
+        print(df_Y)
         if TEST_STATE == 'NY':
             threshold= 500
         else:
@@ -73,11 +74,13 @@ def prediction_data(df, test=False):
 
         day= 0
         daily_increase= 0
-        while daily_increase < threshold:
+        while daily_increase < threshold or pd.isnull(df_Y.at[day, 'date']):
             day+= 1
             daily_increase= df_Y.at[day, 'positiveIncrease']
 
         df_Y= df_Y[day:].copy()
+        print('df_Y after copy')
+        print(df_Y)
         df_Y.reset_index(inplace= True)
         df_Y['t']= pd.Series(range(1, len(df_Y['date'])+1))
 
@@ -110,6 +113,7 @@ def prediction_data(df, test=False):
         times = pd.date_range(df_Y.at[len(df_Y)-1, 'date'], periods= pred_days, freq= '1D')
         df_times = pd.DataFrame({'date': times[1:]})
         df_Y= df_Y.append(df_times, ignore_index = True, sort= False)
+        print(df_Y['date'])
         df_Y['date'] = pd.DatetimeIndex(df_Y['date']).astype(np.int64) // 10**9 + 20 * 60 * 60 # Add back the truncated time
         df_Y['t']= pd.Series(range(1, len(df_Y['date'])+1))
 
