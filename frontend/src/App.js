@@ -6,12 +6,14 @@ import ComboBox from './components/AutoCompleteBar.js'
 import ChoroplethMap from './components/ChoroplethMap.js'
 import { Tabs } from './components/Tabs.js'
 import { CSSTransition } from 'react-transition-group'
+import { withCookies } from 'react-cookie'
 Chart.defaults.global.defaultFontFamily = 'Roboto, sans-serif'
 
 // App
 class App extends React.Component {
   constructor (props) {
     super(props)
+    const { cookies } = props
     this.handleChange = this.handleChange.bind(this)
     this.changeTab = this.changeTab.bind(this)
     this.handleOnEnter = this.handleOnEnter.bind(this)
@@ -21,7 +23,8 @@ class App extends React.Component {
       charts: [],
       activeTab: 'Prediction',
       tabs: ['Data', 'Prediction', 'Map'],
-      height: null
+      height: null,
+      lastStateInput: cookies.get('stateInput', { doNotParse: false }) || { index: 0, input: 'NY' }
     }
   }
 
@@ -33,6 +36,8 @@ class App extends React.Component {
 
   handleChange (event, value, reason) {
     if (value === null) return
+    const { cookies } = this.props
+    cookies.set('stateInput', { index: value.index, input: value.input }, { path: '/', maxAge: 3600 * 24 * 5 })
     getData(value.input)
       .then((data) => {
         this.setState({
@@ -55,7 +60,7 @@ class App extends React.Component {
   }
 
   componentDidMount () {
-    getData('NY')
+    getData(this.state.lastStateInput.input)
       .then((data) => {
         this.setState({
           data: data
@@ -92,7 +97,7 @@ class App extends React.Component {
           </div>
           <div className='nook-phone-center'>
             <div className='main chart-wrapper'>
-              <ComboBox onHandleChange={this.handleChange} />
+              <ComboBox onHandleChange={this.handleChange} defaultInput={this.state.lastStateInput} />
             </div>
             <Tabs handleTabClick={this.changeTab} activeTab={this.state.activeTab} tabs={this.state.tabs} />
             <div
@@ -218,4 +223,4 @@ class App extends React.Component {
   }
 }
 
-export default App
+export default withCookies(App)

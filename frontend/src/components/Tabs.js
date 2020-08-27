@@ -37,7 +37,10 @@ class Tabs extends React.Component {
     const buttons = []
     return (
       <div>
-        {this.props.tabs.map(tab => { buttons.push(tab) })}
+        {this.props.tabs.map(tab => {
+          buttons.push(tab)
+          return null
+        })}
 
         <TabButtons activeTab={this.props.activeTab} buttons={buttons} changeTab={this.changeTab} />
 
