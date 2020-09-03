@@ -21,7 +21,7 @@ class App extends React.Component {
     this.state = {
       data: null,
       charts: [],
-      activeTab: 'Prediction',
+      activeTab: cookies.get('lastTab') || 'Prediction',
       tabs: ['Data', 'Prediction', 'Map'],
       height: null,
       lastStateInput: cookies.get('stateInput', { doNotParse: false }) || { index: 0, input: 'NY' }
@@ -29,6 +29,8 @@ class App extends React.Component {
   }
 
   changeTab (tab) {
+    const { cookies } = this.props
+    cookies.set('lastTab', tab, { path: '/', maxAge: 3600 * 24 * 5 })
     this.setState({
       activeTab: tab
     })
