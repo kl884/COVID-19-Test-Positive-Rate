@@ -57,7 +57,7 @@ class ChoroplethMap extends React.Component {
           return '<div class="hoverinfo">' +
             '<strong>' + geo.properties.name + '</strong>' +
             // '<br>active cases: <strong>' + data.active.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</strong>' +
-            '<br>avg. new case per 100k for past 7 days: <strong>' + data.avg100k.toFixed(1) + '</strong>' +
+            '<br>avg. new cases per 100k residents for past 7 days: <strong>' + data.avg100k.toFixed(1) + '</strong>' +
             '<br>avg. test positive rate for past 7 days: <strong>' + data.avgPos.toFixed(1) + '%</strong>' +
             // '<br>test positive rate: <strong>' + data.numberOfThings.toFixed(1) + '%</strong>' +
             '</div>'
