@@ -28,6 +28,17 @@ def slice_latest(df):
     
     return df_latest
 
+def readPop():
+    population= pd.read_csv('https://raw.githubusercontent.com/eestanleyland/COVID-19-Test-Positive-Rate/master/data/nst-est2019-alldata.csv', usecols=COLUMNS_FOR_POPULATION)
+    StateNameList= ['United States', 'Northeast Region', 'Midwest Region', 'South Region', 'West Region', 
+           'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'District of Columbia', 'FL', 'GA', 
+           'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 
+           'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 
+           'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'Puerto Rico']
+    population['state']= StateNameList
+    return population[['state','POPESTIMATE2019']]
+
+
 def prediction_data(df, test=False):
     # If bass_df == True:
     #     Returns a dataframe contains state's actual data and modeled data and varfinal[M,p,q]
@@ -128,6 +139,7 @@ def prediction_data(df, test=False):
 # for line graphs
 def slice_state(df, state=None):
     # df_state= df.loc[df['state'] == state]
+    pop = readPop()
     if state is not None:
         df = df.loc[df['state'] == state]
     # print(df['dateChecked'][0])
@@ -139,6 +151,8 @@ def slice_state(df, state=None):
     # temp = map(PrintTypeAndValue, df['dateChecked'])
     # quit()
     active_column = df['positive'] - df['death'] - df['recovered']
+    dfpop = pd.merge(df['state'],pop,how='left',on='state')
+    print(dfpop)
     data_for_graph = {
         'state': df['state'],
         'total_pos_rate': df['positive']/df['total']*100,
@@ -155,7 +169,8 @@ def slice_state(df, state=None):
         # stack plot
         'death': df['death'],
         'recovered': df['recovered'].where(active_column >= 0, df['positive'] - df['death']),
-        'active': np.clip(active_column, 0, None)
+        'active': np.clip(active_column, 0, None),
+        'newCasePer100k':df['positiveIncrease']/dfpop['POPESTIMATE2019']*(10**5)
     }
     result_df = pd.DataFrame(data_for_graph)
     result_df = result_df.dropna(axis=0, subset=['date'])
