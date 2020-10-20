@@ -33,7 +33,7 @@ class ChoroplethMap extends React.Component {
     this.state.data.forEach(function (item) { //
       // item example value ["USA", 70]
       const iso = item[0]
-      const avgPos = item[1]
+      const avgPos = item[1] * 100
       const avg100k = item[2]
       const active = item[3]
       dataset[iso] = { avgPos: avgPos, avg100k: avg100k, fillColor: paletteScale(avgPos), active: active }

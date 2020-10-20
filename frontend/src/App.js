@@ -74,8 +74,8 @@ class App extends React.Component {
     return (
       <div>
         <div className='dialog-box'>
-          <h2 className='dialog-box__name'>Tips</h2>
-          <p>Hover over the points to see tooltips, and click on the graph to show all the points.
+          <h2 className='dialog-box__name'>Hello</h2>
+          <p>Stay informed with <a href='https://www.ft.com/coronavirusfree' target='_blank'>COVID-19 reports</a> made free by the <a href='https://www.ft.com/' target='_blank'>Financial Times</a>.
           </p>
         </div>
 
