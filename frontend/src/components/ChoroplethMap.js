@@ -89,7 +89,6 @@ class ChoroplethMap extends React.Component {
   componentDidMount () {
     fetchDataChoro()
       .then((data) => {
-        console.log(data)
         this.setState({
           data: data.data
         })
