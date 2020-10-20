@@ -74,7 +74,7 @@ class App extends React.Component {
     return (
       <div>
         <div className='dialog-box'>
-          <h2 className='dialog-box__name'>Hello</h2>
+          <h2 className='dialog-box__name'>Tip</h2>
           <p>Stay informed with <a href='https://www.ft.com/coronavirusfree' target='_blank'>COVID-19 reports</a> made free by the <a href='https://www.ft.com/' target='_blank'>Financial Times</a>.
           </p>
         </div>
