@@ -113,6 +113,16 @@ async function getData (state) {
     })
   })
 
+  data.push({
+    title: `${state} State New Cases per 100k residents`,
+    data: fetchedData.data.map((row) => {
+      return {
+        time: row.date,
+        value: row.newCasePer100k
+      }
+    })
+  })
+
   return data
 }
 

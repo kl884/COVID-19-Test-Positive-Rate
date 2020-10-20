@@ -135,7 +135,9 @@ class App extends React.Component {
                     <div className='sub chart-wrapper'>
                       <CumulChart
                         data={this.state.data[0].data}
+                        dataNewCase={this.state.data[10].data}
                         title={this.state.data[0].title}
+                        titleNewCase={this.state.data[10].title}
                         yLabel='Cumulative Test Positive Rate (%)'
                         color='#3498DB'
                       />

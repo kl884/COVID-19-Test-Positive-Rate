@@ -33,8 +33,10 @@ class ChoroplethMap extends React.Component {
     this.state.data.forEach(function (item) { //
       // item example value ["USA", 70]
       const iso = item[0]
-      const value = item[1]
-      dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value), active: item[2] }
+      const avgPos = item[1]
+      const avg100k = item[2]
+      const active = item[3]
+      dataset[iso] = { avgPos: avgPos, avg100k: avg100k, fillColor: paletteScale(avgPos), active: active }
     })
 
     var map = new Datamap({
@@ -54,8 +56,10 @@ class ChoroplethMap extends React.Component {
           // tooltip content
           return '<div class="hoverinfo">' +
             '<strong>' + geo.properties.name + '</strong>' +
-            '<br>active cases: <strong>' + data.active.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</strong>' +
-            '<br>test positive rate: <strong>' + data.numberOfThings.toFixed(1) + '%</strong>' +
+            // '<br>active cases: <strong>' + data.active.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</strong>' +
+            '<br>avg. new case per 100k for past 7 days: <strong>' + data.avg100k.toFixed(1) + '</strong>' +
+            '<br>avg. test positive rate for past 7 days: <strong>' + data.avgPos.toFixed(1) + '%</strong>' +
+            // '<br>test positive rate: <strong>' + data.numberOfThings.toFixed(1) + '%</strong>' +
             '</div>'
         }
       },
@@ -85,6 +89,7 @@ class ChoroplethMap extends React.Component {
   componentDidMount () {
     fetchDataChoro()
       .then((data) => {
+        console.log(data)
         this.setState({
           data: data.data
         })

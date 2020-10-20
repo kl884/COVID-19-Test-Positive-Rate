@@ -41,7 +41,7 @@ const convertToJsonChoro = function (csvName) {
       .pipe(csv())
       .on('data', (data) => {
         if (dataSoFar === numDataNeeded) return
-        result.push([data.state, parseFloat(data.total_pos_rate), data.active])
+        result.push([data.state, parseFloat(data.averageDailyTestPositiveRate), parseFloat(data.averageNewCasePer100k), data.active])
         dataSoFar++
       })
       .on('end', () => {

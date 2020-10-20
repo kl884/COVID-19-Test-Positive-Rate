@@ -152,12 +152,11 @@ def slice_state(df, state=None):
     # quit()
     active_column = df['positive'] - df['death'] - df['recovered']
     dfpop = pd.merge(df['state'],pop,how='left',on='state')
-    print(dfpop)
+    newCasePer100k = df['positiveIncrease']/dfpop['POPESTIMATE2019']*(10**5)
     data_for_graph = {
         'state': df['state'],
         'total_pos_rate': df['positive']/df['total']*100,
         'daily_pos_Rate': df['positiveIncrease']/df['totalTestResultsIncrease']*100,
-
         # date is in ISO 8601 format by default, now converting to miliseconds unix timestamp
         # REMINDER can use ISO 8601 string for drawing chart but will test later
         
@@ -170,11 +169,28 @@ def slice_state(df, state=None):
         'death': df['death'],
         'recovered': df['recovered'].where(active_column >= 0, df['positive'] - df['death']),
         'active': np.clip(active_column, 0, None),
-        'newCasePer100k':df['positiveIncrease']/dfpop['POPESTIMATE2019']*(10**5)
+        'newCasePer100k':newCasePer100k,
     }
     result_df = pd.DataFrame(data_for_graph)
     result_df = result_df.dropna(axis=0, subset=['date'])
+    StateOptionList= ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 
+           'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 
+           'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 
+           'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY']
+    
+    averageData = []
+    for state in StateOptionList:
+        averageNewCasePer100k = result_df.loc[result_df['state'] == state,'newCasePer100k'].head(7).mean()
+        sumNewIncrease = df.loc[df['state'] == state, ['positiveIncrease']].head(7).sum()
+        sumVolIncrase = df.loc[df['state'] == state, ['totalTestResultsIncrease']].head(7).sum()
+        averageTestPositiveRate = sumNewIncrease / float(sumVolIncrase)
+        value = averageTestPositiveRate[0]
+        averageData.append([state, averageNewCasePer100k,value])
+    
+    df_average = pd.DataFrame(averageData, columns=['state','averageNewCasePer100k','averageDailyTestPositiveRate'])
+    result_df = pd.merge(result_df,df_average,how='left',on='state')
     result_df.to_csv(RELATIVE_PATH_CSV, index=False, header=True)
+
     return result_df
 
 def log_output(message, log_type='info'):
@@ -194,6 +210,7 @@ if __name__ == '__main__':
         df = df.fillna(0)
         log_output("Fetch data count: {}".format(len(df.index)))
         df_states = slice_state(df)
+        
         log_output("Sliced state count: {}".format(len(df_states.index)))
         df_prediction = prediction_data(df)
         log_output("Prediction data count: {}".format(len(df_prediction.index)))

@@ -44,7 +44,9 @@ const defaultSetting = (context) => {
     },
     ticks: {
       min: context.ticksMin.time - 24 * 60 * 60 * 1000,
-      max: context.ticksMax.time + 3 * 24 * 60 * 60 * 1000
+      max: context.ticksMax.time + 3 * 24 * 60 * 60 * 1000,
+      maxTicksLimit: 8,
+      autoSkip: true
     }
   }
 }
@@ -106,6 +108,8 @@ class CumulChart extends React.Component {
   componentDidUpdate () {
     this.myChart.data.labels = this.props.data.map(d => d.time)
     this.myChart.data.datasets[0].data = this.props.data.map(d => d.value)
+    this.myChart.data.datasets[1].data = this.props.dataNewCase.map(d => d.value)
+    this.myChart.data.datasets[1].label = this.props.titleNewCase
     this.myChart.data.datasets[0].label = this.props.title
     this.myChart.options.title.text = this.props.title
     this.myChart.update()
@@ -117,6 +121,7 @@ class CumulChart extends React.Component {
       options: {
         title: defaultOptionsForAllGraph.title,
         onClick: function (...args) {
+          return
           const ci = this.chart
           const meta = ci.getDatasetMeta(0)
           if (meta.showAllPoint) {
@@ -135,6 +140,7 @@ class CumulChart extends React.Component {
             // usePointStyle: true
           },
           onClick: function (e, legendItem) {
+            return
             const datasetIndex = legendItem.datasetIndex
             const ci = this.chart
             const meta = ci.getDatasetMeta(datasetIndex)
@@ -155,18 +161,23 @@ class CumulChart extends React.Component {
           intersect: defaultOptionsForAllGraph.tooltipIntersect,
           callbacks: {
             title: function (tooltipItem, data) {
-              const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem) + ' (%)'
+              const title = defaultOptionsForAllGraph.tooltipItemTitle(tooltipItem)
               return title
             },
             label: function (tooltipItem, data) {
-              let label = 'Test Positive Rate: '
-              label += defaultOptionsForAllGraph.tooltipItemPercentage(tooltipItem)
+              let label = defaultOptionsForAllGraph.tooltipItemLabel(tooltipItem, data)
+
+              if (tooltipItem.datasetIndex === 0) {
+                label += ' (%): '
+                label += defaultOptionsForAllGraph.tooltipItemPercentage(tooltipItem)
+              } else {
+                label += ' (Count): '
+                label += defaultOptionsForAllGraph.tooltipItemPercentage(tooltipItem)
+              }
               return label
             },
             labelColor: function (tooltipItem, data) {
-              return {
-                backgroundColor: '#3498DB'
-              }
+              return tooltipItem.datasetIndex === 0 ? { backgroundColor: '#3498DB' } : { backgroundColor: '#1E8449' }
             }
           }
         },
@@ -202,6 +213,20 @@ class CumulChart extends React.Component {
           pointHoverBackgroundColor: this.props.color,
           borderColor: this.props.color,
           borderWidth: defaultOptionsForAllGraph.borderWidth
+        },
+        {
+          label: this.props.titleNewCase,
+          data: this.props.dataNewCase.map(d => d.value), // d is array of objects with properties time and value
+          fill: 'none',
+          backgroundColor: '#1E8449',
+          pointRadius: function (context) {
+            return context.dataIndex < 3 ? defaultOptionsForAllGraph.pointRadius : 0
+          },
+          pointBorderWidth: defaultOptionsForAllGraph.pointBorderWidth,
+          pointBackgroundColor: defaultOptionsForAllGraph.pointBackgroundColor,
+          pointHoverBackgroundColor: '#1E8449',
+          borderColor: '#1E8449',
+          borderWidth: defaultOptionsForAllGraph.borderWidth
         }]
       }
     })
@@ -234,6 +259,7 @@ class DailyChart extends React.Component {
         title: defaultOptionsForAllGraph.title,
         onClick: function (...args) {
           // const datasetIndex = legendItem.datasetIndex
+          return
           const ci = this.chart
           const meta = ci.getDatasetMeta(0)
           if (meta.showAllPoint) {
@@ -257,6 +283,7 @@ class DailyChart extends React.Component {
           },
           onClick: function (e, legendItem) {
             // const datasetIndex = legendItem.datasetIndex
+            return
             const ci = this.chart
             const meta = ci.getDatasetMeta(0)
             if (meta.showAllPoint) {
@@ -398,6 +425,7 @@ class PredDailyChart extends React.Component {
       type: 'LineWithLine',
       options: {
         onClick: function (...args) {
+          return
           const ci = this.chart
           const meta = ci.getDatasetMeta(0)
           if (meta.showAllPoint) {
@@ -413,6 +441,7 @@ class PredDailyChart extends React.Component {
         legend: {
           display: true,
           onClick: function (e, legendItem) {
+            return
             const datasetIndex = legendItem.datasetIndex
             const ci = this.chart
             const meta = ci.getDatasetMeta(datasetIndex)
@@ -528,6 +557,7 @@ class PredCumulChart extends React.Component {
       type: 'LineWithLine',
       options: {
         onClick: function (...args) {
+          return
           const ci = this.chart
           const meta = ci.getDatasetMeta(0)
           if (meta.showAllPoint) {
@@ -543,6 +573,7 @@ class PredCumulChart extends React.Component {
         legend: {
           display: true,
           onClick: function (e, legendItem) {
+            return
             const datasetIndex = legendItem.datasetIndex
             const ci = this.chart
             const meta = ci.getDatasetMeta(datasetIndex)
@@ -664,6 +695,7 @@ class StackedChart extends React.Component {
       options: {
         title: defaultOptionsForAllGraph.title,
         onClick: function (...args) {
+          return
           // const datasetIndex = legendItem.datasetIndex
           const ci = this.chart
           const meta = ci.getDatasetMeta(0)
@@ -685,6 +717,7 @@ class StackedChart extends React.Component {
             // usePointStyle: true
           },
           onClick: function (e, legendItem) {
+            return
             // const datasetIndex = legendItem.datasetIndex
             const ci = this.chart
             const meta = ci.getDatasetMeta(0)
